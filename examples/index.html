@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>particle-life-bg playground</title>
+    <link rel="stylesheet" href="./playground.css" />
+  </head>
+  <body>
+    <aside class="panel">
+      <h1>particle-life-bg</h1>
+
+      <section>
+        <h2>シミュレーション</h2>
+        <div id="ranges"></div>
+        <label class="row"><span>fps</span><select id="fps"></select></label>
+      </section>
+
+      <section>
+        <h2>引力行列</h2>
+        <label class="row"><span>matrix</span><select id="matrix"></select></label>
+        <label class="row">
+          <span>seed</span>
+          <input id="seed" type="number" min="0" placeholder="(毎回ランダム)" />
+        </label>
+        <div class="buttons">
+          <button id="shuffle" type="button">shuffle (新しい seed)</button>
+          <button id="respawn" type="button">撒き直す</button>
+        </div>
+        <div id="mx" class="mx"></div>
+        <p class="hint">行 i が列 j に引かれる強さ。上下ドラッグ / ホイールで調整、ダブルクリックで 0。編集すると matrix=custom</p>
+      </section>
+
+      <section>
+        <h2>描画</h2>
+        <label class="row"><span>scheme</span><select id="scheme"></select></label>
+        <label class="row">
+          <span>background</span>
+          <select id="bg-mode">
+            <option value="scheme">scheme の地</option>
+            <option value="transparent">transparent</option>
+            <option value="color">色指定</option>
+          </select>
+          <input id="bg-color" type="color" value="#000000" />
+        </label>
+        <label class="row"><span>drawStyle</span><select id="style-all"></select></label>
+        <div id="styles" class="styles"></div>
+      </section>
+
+      <section>
+        <label class="row check"><input id="sample" type="checkbox" checked /> サンプル文字を重ねる</label>
+        <button id="reset" type="button">既定値に戻す</button>
+      </section>
+    </aside>
+
+    <main class="main">
+      <nav id="formats" class="tabs" aria-label="preview format"></nav>
+      <div id="stage" class="stage"></div>
+
+      <div class="bottom">
+        <section class="card">
+          <header class="card-head">
+            <nav id="code-tabs" class="tabs">
+              <button type="button" data-tab="html">HTML</button>
+              <button type="button" data-tab="vanilla">Vanilla</button>
+              <button type="button" data-tab="react">React</button>
+              <button type="button" data-tab="json">Options JSON</button>
+            </nav>
+            <button id="copy" type="button">copy</button>
+          </header>
+          <pre><code id="code"></code></pre>
+          <p class="hint">既定値と同じものは省略。URL にも同じ設定が入るので、そのまま共有できる</p>
+        </section>
+
+        <section class="card">
+          <header class="card-head"><h2>負荷の見積もり</h2></header>
+          <table class="perf">
+            <thead>
+              <tr><th>format</th><th>size</th><th>評価</th><th></th><th>CPU</th><th>/frame</th><th>sim 比</th></tr>
+            </thead>
+            <tbody id="perf-body"></tbody>
+          </table>
+          <p id="meter" class="meter">実測: 計測中…</p>
+          <p class="hint">
+            CPU = 1 コア占有率の概算 (近傍探索 + 描画 + 全面塗り)。端末ごとの dpr (maxPixelRatio=2 で頭打ち) と CPU 性能差を掛けた式で、桁が合う程度の目安。
+            実測は今表示中の 1 画面だけ、この PC で rAF コールバックに掛かった時間 (GPU 合成は含まない)。行クリックで切替
+          </p>
+        </section>
+      </div>
+    </main>
+
+    <!-- pnpm build してから、このリポのルートで静的サーバーを立てて開く (module script は file:// で読めない) -->
+    <script type="module" src="./playground.js"></script>
+  </body>
+</html>

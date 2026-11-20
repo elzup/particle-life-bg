@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>particle-life-bg element</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        color: #eee;
+        background: #000;
+      }
+      particle-life-bg {
+        height: 60vh;
+        display: grid;
+        place-items: center;
+      }
+      .content {
+        display: grid;
+        place-items: center;
+        height: 100%;
+        text-align: center;
+      }
+      .banner {
+        height: 160px;
+      }
+      button {
+        margin-top: 12px;
+      }
+    </style>
+  </head>
+  <body>
+    <particle-life-bg id="hero" scheme="neon" draw-style="glow dots" fps="30">
+      <div class="content">
+        <div>
+          <h1>&lt;particle-life-bg&gt;</h1>
+          <p>属性だけで設定。子要素はそのまま前面に出る</p>
+          <button id="shuffle" type="button">shuffle</button>
+        </div>
+      </div>
+    </particle-life-bg>
+
+    <particle-life-bg class="banner" scheme="fire" draw-style="speedGlow" count="800" seed="42"></particle-life-bg>
+
+    <!-- 本番では https://cdn.jsdelivr.net/npm/particle-life-bg@<version>/lib/esm/element.js -->
+    <script type="module">
+      import '../lib/esm/element.js'
+
+      document.getElementById('shuffle').onclick = () =>
+        document.getElementById('hero').shuffle()
+    </script>
+  </body>
+</html>

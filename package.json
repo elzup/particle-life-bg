@@ -1,0 +1,82 @@
+{
+  "name": "particle-life-bg",
+  "version": "0.0.0",
+  "description": "Particle Life (asymmetric attraction) animated canvas background. Zero-dependency core with an optional React component.",
+  "author": "elzup",
+  "license": "MIT",
+  "type": "module",
+  "main": "lib/cjs/index.js",
+  "module": "lib/esm/index.js",
+  "types": "lib/types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/types/index.d.ts",
+      "import": "./lib/esm/index.js",
+      "require": "./lib/cjs/index.js"
+    },
+    "./react": {
+      "types": "./lib/types/react.d.ts",
+      "import": "./lib/esm/react.js",
+      "require": "./lib/cjs/react.js"
+    },
+    "./element": {
+      "types": "./lib/types/element.d.ts",
+      "import": "./lib/esm/element.js",
+      "require": "./lib/cjs/element.js"
+    }
+  },
+  "repository": "elzup/particle-life-bg",
+  "bugs": {
+    "url": "https://github.com/elzup/particle-life-bg/issues"
+  },
+  "homepage": "https://github.com/elzup/particle-life-bg#readme",
+  "keywords": [
+    "particle-life",
+    "background",
+    "canvas",
+    "animation",
+    "artificial-life",
+    "react",
+    "web-components",
+    "custom-element"
+  ],
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "clean": "rm -rf lib",
+    "build": "pnpm clean && pnpm build:cjs && pnpm build:esm && pnpm build:types",
+    "build:cjs": "tsc --module commonjs --declaration false --outDir lib/cjs && echo '{\"type\":\"commonjs\"}' > lib/cjs/package.json",
+    "build:esm": "tsc --declaration false --outDir lib/esm",
+    "build:types": "tsc --declaration --emitDeclarationOnly --outDir lib/types",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "test": "node --test \"test/**/*.test.ts\"",
+    "test:cov": "node --test --experimental-test-coverage --test-coverage-include=\"src/**\" \"test/**/*.test.ts\"",
+    "prepublishOnly": "pnpm test"
+  },
+  "files": [
+    "lib/"
+  ],
+  "sideEffects": [
+    "./lib/esm/element.js",
+    "./lib/cjs/element.js"
+  ],
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.7",
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.3.0",
+    "react": "^19.3.1",
+    "typescript": "^7.0.2"
+  },
+  "packageManager": "pnpm@12.15.0",
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}

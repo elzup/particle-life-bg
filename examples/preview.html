@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>particle-life-bg preview</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        font-family: system-ui, sans-serif;
+      }
+      .hero {
+        position: relative;
+        height: 100%;
+        display: grid;
+        place-items: center;
+      }
+      .sample {
+        position: relative;
+        text-align: center;
+        color: #fff;
+        text-shadow: 0 1px 8px rgb(0 0 0 / 0.6);
+      }
+      .sample h1 {
+        margin: 0;
+        font-size: clamp(1.5rem, 6vw, 4.5rem);
+      }
+      .sample p {
+        margin: 0.5em 0 0;
+        font-size: clamp(0.9rem, 2vw, 1.25rem);
+        opacity: 0.85;
+      }
+      .sample[hidden] {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="hero" id="hero">
+      <div class="sample" id="sample">
+        <h1>particle-life-bg</h1>
+        <p>Cells, chains and chasers emerge on their own.</p>
+      </div>
+    </section>
+
+    <script type="module">
+      // 親 (playground) が同一オリジンなので window.preview を直接叩く。実寸で描くため iframe に分けている
+      import { mount } from '../lib/esm/index.js'
+
+      // 計測窓の長さ。1 秒ごとに「その間に rAF コールバックで使った時間」を占有率にする
+      const WINDOW_MS = 1000
+      const meter = { load: 0, busy: 0, since: performance.now() }
+      const rawRaf = window.requestAnimationFrame.bind(window)
+
+      // ライブラリは rAF の中で step + draw するので、コールバックを包めば 1 フレームの CPU 時間が取れる (GPU 合成は含まない)
+      window.requestAnimationFrame = (cb) =>
+        rawRaf((t) => {
+          const start = performance.now()
+          cb(t)
+          meter.busy += performance.now() - start
+        })
+
+      const tick = () => {
+        const now = performance.now()
+        const span = now - meter.since
+        if (span >= WINDOW_MS) {
+          meter.load = meter.busy / span
+          meter.busy = 0
+          meter.since = now
+        }
+        rawRaf(tick)
+      }
+      rawRaf(tick)
+
+      // 調整中に止まると分からないので、OS の reduced motion 設定でも動かす
+      const bg = mount(document.getElementById('hero'), { respectReducedMotion: false })
+
+      window.preview = {
+        bg,
+        meter,
+        setSample: (isShown) => {
+          document.getElementById('sample').hidden = !isShown
+        },
+      }
+      window.parent.postMessage({ type: 'preview-ready' }, location.origin)
+    </script>
+  </body>
+</html>
