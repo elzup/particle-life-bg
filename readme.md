@@ -95,6 +95,20 @@ $ pnpm build && npx serve .
 # /examples/element.html  the web component in plain HTML
 ```
 
+## Development
+
+### Benchmarks
+
+Used to decide whether a WASM engine or another renderer is worth shipping. These benchmarks are not part of the package.
+
+```
+$ pnpm build && pnpm build:wasm   # needs the wasm32-unknown-unknown Rust target
+$ pnpm bench                      # step only, JS / WASM / WASM SIMD on Node
+$ npx serve .                     # then open /examples/bench.html for the same in a browser, plus a draw bench per drawStyle
+```
+
+The browser bench is also deployed at https://elzup.github.io/particle-life-bg/examples/bench.html and measures the device that opens it.
+
 ## License
 
 MIT © [anozon](https://anozon.me)
