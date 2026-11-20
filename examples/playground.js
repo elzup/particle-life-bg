@@ -13,6 +13,7 @@ import {
   toReact,
   toVanilla,
 } from './codegen.js'
+import { applyStatic, LANGS, labelParam, lang, switchLang, t } from './i18n.js'
 import { createMatrixEditor } from './matrix-editor.js'
 import { estimate, FORMATS, rate, stars } from './perf.js'
 import { createStage } from './stage.js'
@@ -27,11 +28,11 @@ const METER_INTERVAL_MS = 1000
 const COPY_FEEDBACK_MS = 1200
 
 const RANGES = [
-  { key: 'count', label: 'count', min: 100, max: 5000, step: 100 },
-  { key: 'types', label: 'types', min: 2, max: 12, step: 1 },
-  { key: 'rMax', label: 'rMax', min: 0.02, max: 0.3, step: 0.005 },
-  { key: 'friction', label: 'friction', min: 0.005, max: 0.2, step: 0.005 },
-  { key: 'force', label: 'force', min: 1, max: 30, step: 0.5 },
+  { key: 'count', min: 100, max: 5000, step: 100 },
+  { key: 'types', min: 2, max: 12, step: 1 },
+  { key: 'rMax', min: 0.02, max: 0.3, step: 0.005 },
+  { key: 'friction', min: 0.005, max: 0.2, step: 0.005 },
+  { key: 'force', min: 1, max: 30, step: 0.5 },
 ]
 
 const repeatTo = (list, n) =>
@@ -119,7 +120,7 @@ const buildRanges = () => {
       const input = document.createElement('input')
       const out = document.createElement('output')
       row.className = 'row'
-      name.textContent = r.label
+      labelParam(name, r.key)
       Object.assign(input, {
         type: 'range',
         min: r.min,
@@ -191,7 +192,7 @@ const bindControls = () => {
   fillSelect($('scheme'), Object.keys(COLOR_SCHEMES), state.scheme)
   fillSelect($('fps'), [60, 30, 24, 15], state.fps)
   fillSelect($('matrix'), [...MATRIX_PRESETS, 'custom'], 'random')
-  fillSelect($('style-all'), ['(種類ごと)', ...DRAW_STYLES], '(種類ごと)')
+  fillSelect($('style-all'), [t('perType'), ...DRAW_STYLES], t('perType'))
   $('scheme').onchange = (e) => commit({ scheme: e.target.value })
   $('fps').onchange = (e) => commit({ fps: Number(e.target.value) })
   $('matrix').onchange = (e) => {
@@ -200,7 +201,7 @@ const bindControls = () => {
   $('style-all').onchange = (e) => {
     if (DRAW_STYLES.includes(e.target.value))
       commit({ drawStyle: repeatTo([e.target.value], state.types) })
-    e.target.value = '(種類ごと)'
+    e.target.value = t('perType')
   }
   $('seed').onchange = (e) =>
     commit({ seed: e.target.value === '' ? undefined : Number(e.target.value) })
@@ -277,6 +278,13 @@ const renderOutputs = () => {
 
 // ---- 負荷 ----
 
+// 端末名は製品名 (Desktop 等) なら訳さず、日本語ラベルのものだけ訳を持つ
+const formatLabel = (f) => {
+  const key = `format.${f.id}`
+  const translated = t(key)
+  return translated === key ? f.label : translated
+}
+
 const currentFormat = () => {
   if (formatId !== 'fit') return FORMATS.find((f) => f.id === formatId)
   const rect = $('stage').getBoundingClientRect()
@@ -298,10 +306,10 @@ const renderPerf = () => {
     const e = estimate(state, f)
     const tr = document.createElement('tr')
     const cells = [
-      f.label,
-      `${f.width}×${f.height} @${f.dpr}x${f.screens ? ` (${f.screens} 画面)` : ''}`,
+      formatLabel(f),
+      `${f.width}×${f.height} @${f.dpr}x${f.screens ? ` (${t('screens', { n: f.screens })})` : ''}`,
       stars(e.stars),
-      e.label,
+      t(`rate.${e.stars}`),
       `${(e.load * 100).toFixed(1)}%`,
       `${e.frameMs.toFixed(2)} ms`,
       `${Math.round(e.simShare * 100)}%`,
@@ -324,8 +332,12 @@ const renderMeter = () => {
   if (!preview) return
   const load = preview.meter.load
   const r = rate(load)
-  $('meter').textContent =
-    `実測 (このPC・${currentFormat().label}): CPU ${(load * 100).toFixed(1)}% ${stars(r.stars)} ${r.label}`
+  $('meter').textContent = t('meter', {
+    format: formatLabel(currentFormat()),
+    cpu: (load * 100).toFixed(1),
+    stars: stars(r.stars),
+    label: t(`rate.${r.stars}`),
+  })
 }
 
 // ---- フォーマット / コード切替 ----
@@ -356,7 +368,7 @@ const buildFormatTabs = () => {
       const b = document.createElement('button')
       b.type = 'button'
       b.dataset.format = f.id
-      b.textContent = f.label
+      b.textContent = formatLabel(f)
       b.onclick = () => selectFormat(f.id)
       return b
     })
@@ -386,6 +398,22 @@ const bindCodeTabs = () => {
   }
 }
 
+const buildLangTabs = () => {
+  $('langs').replaceChildren(
+    ...LANGS.map((l) => {
+      const b = document.createElement('button')
+      b.type = 'button'
+      b.dataset.lang = l
+      b.textContent = l
+      b.onclick = () => l !== lang && switchLang(l)
+      return b
+    })
+  )
+  markActive($('langs'), 'lang', lang)
+}
+
+applyStatic()
+buildLangTabs()
 buildRanges()
 bindControls()
 buildFormatTabs()

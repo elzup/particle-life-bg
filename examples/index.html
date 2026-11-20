@@ -8,48 +8,51 @@
   </head>
   <body>
     <aside class="panel">
-      <h1>particle-life-bg</h1>
+      <header class="panel-head">
+        <h1>particle-life-bg</h1>
+        <nav id="langs" class="tabs" aria-label="language"></nav>
+      </header>
 
       <section>
-        <h2>シミュレーション</h2>
+        <h2 data-i18n="simulation">シミュレーション</h2>
         <div id="ranges"></div>
-        <label class="row"><span>fps</span><select id="fps"></select></label>
+        <label class="row"><span data-param="fps">fps</span><select id="fps"></select></label>
       </section>
 
       <section>
-        <h2>引力行列</h2>
-        <label class="row"><span>matrix</span><select id="matrix"></select></label>
+        <h2 data-i18n="matrixTitle">引力行列</h2>
+        <label class="row"><span data-param="matrix">matrix</span><select id="matrix"></select></label>
         <label class="row">
-          <span>seed</span>
-          <input id="seed" type="number" min="0" placeholder="(毎回ランダム)" />
+          <span data-param="seed">seed</span>
+          <input id="seed" type="number" min="0" placeholder="(毎回ランダム)" data-i18n-placeholder="seedPlaceholder" />
         </label>
         <div class="buttons">
-          <button id="shuffle" type="button">shuffle (新しい seed)</button>
-          <button id="respawn" type="button">撒き直す</button>
+          <button id="shuffle" type="button" data-i18n="shuffle">shuffle (新しい seed)</button>
+          <button id="respawn" type="button" data-i18n="respawn">撒き直す</button>
         </div>
         <div id="mx" class="mx"></div>
-        <p class="hint">行 i が列 j に引かれる強さ。上下ドラッグ / ホイールで調整、ダブルクリックで 0。編集すると matrix=custom</p>
+        <p class="hint" data-i18n="matrixHint">行 i が列 j に引かれる強さ。上下ドラッグ / ホイールで調整、ダブルクリックで 0。編集すると matrix=custom</p>
       </section>
 
       <section>
-        <h2>描画</h2>
-        <label class="row"><span>scheme</span><select id="scheme"></select></label>
+        <h2 data-i18n="drawing">描画</h2>
+        <label class="row"><span data-param="scheme">scheme</span><select id="scheme"></select></label>
         <label class="row">
-          <span>background</span>
+          <span data-param="background">background</span>
           <select id="bg-mode">
-            <option value="scheme">scheme の地</option>
+            <option value="scheme" data-i18n="bgScheme">scheme の地</option>
             <option value="transparent">transparent</option>
-            <option value="color">色指定</option>
+            <option value="color" data-i18n="bgColor">色指定</option>
           </select>
           <input id="bg-color" type="color" value="#000000" />
         </label>
-        <label class="row"><span>drawStyle</span><select id="style-all"></select></label>
+        <label class="row"><span data-param="drawStyle">drawStyle</span><select id="style-all"></select></label>
         <div id="styles" class="styles"></div>
       </section>
 
       <section>
-        <label class="row check"><input id="sample" type="checkbox" checked /> サンプル文字を重ねる</label>
-        <button id="reset" type="button">既定値に戻す</button>
+        <label class="row check"><input id="sample" type="checkbox" checked /> <span data-i18n="sample">サンプル文字を重ねる</span></label>
+        <button id="reset" type="button" data-i18n="reset">既定値に戻す</button>
       </section>
     </aside>
 
@@ -69,19 +72,19 @@
             <button id="copy" type="button">copy</button>
           </header>
           <pre><code id="code"></code></pre>
-          <p class="hint">既定値と同じものは省略。URL にも同じ設定が入るので、そのまま共有できる</p>
+          <p class="hint" data-i18n="codeHint">既定値と同じものは省略。URL にも同じ設定が入るので、そのまま共有できる</p>
         </section>
 
         <section class="card">
-          <header class="card-head"><h2>負荷の見積もり</h2></header>
+          <header class="card-head"><h2 data-i18n="perfTitle">負荷の見積もり</h2></header>
           <table class="perf">
             <thead>
-              <tr><th>format</th><th>size</th><th>評価</th><th></th><th>CPU</th><th>/frame</th><th>sim 比</th></tr>
+              <tr><th data-i18n="thFormat">format</th><th data-i18n="thSize">size</th><th data-i18n="thRating">評価</th><th></th><th>CPU</th><th>/frame</th><th data-i18n="thRatio">sim 比</th></tr>
             </thead>
             <tbody id="perf-body"></tbody>
           </table>
-          <p id="meter" class="meter">実測: 計測中…</p>
-          <p class="hint">
+          <p id="meter" class="meter" data-i18n="measuring">実測: 計測中…</p>
+          <p class="hint" data-i18n="perfHint">
             CPU = 1 コア占有率の概算 (近傍探索 + 描画 + 全面塗り)。端末ごとの dpr (maxPixelRatio=2 で頭打ち) と CPU 性能差を掛けた式で、桁が合う程度の目安。
             実測は今表示中の 1 画面だけ、この PC で rAF コールバックに掛かった時間 (GPU 合成は含まない)。行クリックで切替
           </p>
