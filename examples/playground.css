@@ -32,8 +32,22 @@ body {
   background: var(--bg);
 }
 
+/* ja のパラメーター名に添えるオプション名。ふりがなとして控えめに */
+rt {
+  font: 9px var(--mono);
+  color: var(--muted);
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
 h1 {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 16px;
 }
 
@@ -143,9 +157,17 @@ button.is-active:hover {
 }
 
 .mx-head {
-  height: 8px;
-  align-self: center;
   border-radius: 4px;
+}
+
+.mx-head-col {
+  height: 8px;
+  align-self: end;
+}
+
+.mx-head-row {
+  width: 8px;
+  align-self: stretch;
 }
 
 .mx-cell {

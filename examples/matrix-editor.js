@@ -3,6 +3,8 @@
 // 1px ドラッグあたりの変化量。セル 1 つ分 (約 30px) 動かすと 0.3 変わる
 const DRAG_PER_PX = 0.01
 const WHEEL_STEP = 0.05
+// 行見出し (縦帯) の列幅。列見出しの帯の太さとそろえる
+const ROW_HEAD_PX = 8
 
 const clamp = (v) => Math.max(-1, Math.min(1, v))
 
@@ -35,9 +37,10 @@ export const createMatrixEditor = (root, { colorOf, onChange }) => {
     onChange(matrix)
   }
 
-  const header = (t) => {
+  // 列見出しは横帯、行見出しは縦帯。行側を横帯にすると左の列が 1 マスぶん幅を取ってセルが小さくなる
+  const header = (t, axis) => {
     const el = document.createElement('div')
-    el.className = 'mx-head'
+    el.className = `mx-head mx-head-${axis}`
     el.style.background = colorOf(t)
     return el
   }
@@ -68,12 +71,12 @@ export const createMatrixEditor = (root, { colorOf, onChange }) => {
   const render = (next) => {
     matrix = next
     const n = matrix.length
-    root.style.gridTemplateColumns = `repeat(${n + 1}, 1fr)`
+    root.style.gridTemplateColumns = `${ROW_HEAD_PX}px repeat(${n}, 1fr)`
     root.replaceChildren(
       document.createElement('div'),
-      ...matrix.map((_, j) => header(j)),
+      ...matrix.map((_, j) => header(j, 'col')),
       ...matrix.flatMap((row, i) => [
-        header(i),
+        header(i, 'row'),
         ...row.map((_, j) => cell(i, j)),
       ])
     )
