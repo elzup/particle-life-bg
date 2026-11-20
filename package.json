@@ -1,6 +1,6 @@
 {
   "name": "particle-life-bg",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Particle Life (asymmetric attraction) animated canvas background. Zero-dependency core with an optional React component.",
   "author": "elzup",
   "license": "MIT",
@@ -29,7 +29,7 @@
   "bugs": {
     "url": "https://github.com/elzup/particle-life-bg/issues"
   },
-  "homepage": "https://github.com/elzup/particle-life-bg#readme",
+  "homepage": "https://elzup.github.io/particle-life-bg/",
   "keywords": [
     "particle-life",
     "background",
@@ -40,9 +40,6 @@
     "web-components",
     "custom-element"
   ],
-  "engines": {
-    "node": ">=24"
-  },
   "scripts": {
     "clean": "rm -rf lib",
     "build": "pnpm clean && pnpm build:cjs && pnpm build:esm && pnpm build:types",
@@ -54,7 +51,7 @@
     "check:fix": "biome check --write .",
     "test": "node --test \"test/**/*.test.ts\"",
     "test:cov": "node --test --experimental-test-coverage --test-coverage-include=\"src/**\" \"test/**/*.test.ts\"",
-    "prepublishOnly": "pnpm test",
+    "prepublishOnly": "pnpm build && pnpm test",
     "build:wasm": "cargo build --release --target wasm32-unknown-unknown --manifest-path wasm/Cargo.toml && RUSTFLAGS='-C target-feature=+simd128' cargo build --release --target wasm32-unknown-unknown --manifest-path wasm/Cargo.toml --target-dir wasm/target-simd && mkdir -p lib/wasm && cp wasm/target/wasm32-unknown-unknown/release/particle_life_sim.wasm lib/wasm/sim.wasm && cp wasm/target-simd/wasm32-unknown-unknown/release/particle_life_sim.wasm lib/wasm/sim-simd.wasm",
     "bench": "node scripts/bench.ts"
   },

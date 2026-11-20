@@ -4,6 +4,8 @@
 
 Each particle type is attracted to or repelled by the other types according to an asymmetric matrix. Cells, chains and chasers emerge on their own.
 
+**Playground:** https://elzup.github.io/particle-life-bg/ — tune the options and copy the generated code.
+
 ## Install
 
 ```
@@ -88,6 +90,8 @@ import { ParticleLifeBg } from 'particle-life-bg/react'
 | `respectReducedMotion` | `true`      | with `prefers-reduced-motion: reduce`, renders a single still frame                                                       |
 
 ## Demo
+
+The playground is deployed at https://elzup.github.io/particle-life-bg/. To run it locally:
 
 ```
 $ pnpm build && npx serve .
