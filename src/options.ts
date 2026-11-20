@@ -62,12 +62,12 @@ export type Resolved = {
 }
 
 export const DEFAULTS = {
-  types: 6,
+  types: 5,
   count: 1500,
   rMax: 0.1,
   friction: 0.04,
   force: 10,
-  fps: 60,
+  fps: 30,
   maxPixelRatio: 2,
 } as const
 

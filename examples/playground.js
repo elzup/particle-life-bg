@@ -299,7 +299,7 @@ const renderPerf = () => {
     const tr = document.createElement('tr')
     const cells = [
       f.label,
-      `${f.width}×${f.height} @${f.dpr}x`,
+      `${f.width}×${f.height} @${f.dpr}x${f.screens ? ` (${f.screens} 画面)` : ''}`,
       stars(e.stars),
       e.label,
       `${(e.load * 100).toFixed(1)}%`,

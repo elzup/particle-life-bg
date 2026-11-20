@@ -4,11 +4,48 @@
  * cpu: 手元のデスクトップを 1 としたときの遅さ。スマホは JS もラスタも数倍遅い
  * dpr: その端末の devicePixelRatio (maxPixelRatio で頭打ちになる)
  */
+// ページ背景として使う端末は、スクロールぶんも含めた縦の長さで見積もる (要素の高さ = 文書全体)。
+// LP や記事 1 本でおおよそ 3 画面ぶん
+const PAGE_SCREENS = 3
+const page = (f) => ({
+  ...f,
+  height: f.height * PAGE_SCREENS,
+  screens: PAGE_SCREENS,
+})
+
 export const FORMATS = [
-  { id: 'desktop', label: 'Desktop', width: 1440, height: 900, dpr: 2, cpu: 1 },
-  { id: 'laptop', label: 'Laptop', width: 1280, height: 720, dpr: 1, cpu: 1.5 },
-  { id: 'tablet', label: 'Tablet', width: 820, height: 1180, dpr: 2, cpu: 2 },
-  { id: 'mobile', label: 'Mobile', width: 390, height: 844, dpr: 3, cpu: 3 },
+  page({
+    id: 'desktop',
+    label: 'Desktop',
+    width: 1440,
+    height: 900,
+    dpr: 2,
+    cpu: 1,
+  }),
+  page({
+    id: 'laptop',
+    label: 'Laptop',
+    width: 1280,
+    height: 720,
+    dpr: 1,
+    cpu: 1.5,
+  }),
+  page({
+    id: 'tablet',
+    label: 'Tablet',
+    width: 820,
+    height: 1180,
+    dpr: 2,
+    cpu: 2,
+  }),
+  page({
+    id: 'mobile',
+    label: 'Mobile',
+    width: 390,
+    height: 844,
+    dpr: 3,
+    cpu: 3,
+  }),
   { id: 'banner', label: 'Banner', width: 1200, height: 300, dpr: 2, cpu: 1 },
   { id: 'og', label: 'OG 画像', width: 1200, height: 630, dpr: 1, cpu: 1 },
   {

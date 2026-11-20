@@ -95,7 +95,7 @@ describe('estimate', () => {
   })
   test('fps を半分にすると占有率も半分', () => {
     const a = estimate(base, desktop)
-    const b = estimate({ ...base, fps: 30 }, desktop)
+    const b = estimate({ ...base, fps: base.fps / 2 }, desktop)
     assert.ok(Math.abs(b.load - a.load / 2) < 1e-9)
   })
   test('縦長は近傍セルが少ないぶん同じ粒子数でも重い', () => {

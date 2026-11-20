@@ -70,7 +70,7 @@ import { ParticleLifeBg } from 'particle-life-bg/react'
 
 | option                 | default     |                                                                                                                           |
 | ---------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `types`                | `6`         | number of particle types (ignored when `matrix` is an array)                                                              |
+| `types`                | `5`         | number of particle types (ignored when `matrix` is an array)                                                              |
 | `count`                | `1500`      | particles. Cost ≈ count × neighbours, independent of the element size                                                     |
 | `matrix`               | `'random'`  | `number[][]` (`matrix[i][j]`: how strongly i is pulled toward j, -1..1) or `'random' \| 'symmetric' \| 'snake' \| 'zero'` |
 | `seed`                 | —           | fixes the matrix and initial positions                                                                                    |
@@ -80,7 +80,7 @@ import { ParticleLifeBg } from 'particle-life-bg/react'
 | `drawStyle`            | `'dots'`    | `dots` `glow` `trail` `streak` `links` `mono` `speedGlow` `crowdGlow`, or an array per type (repeats)                     |
 | `scheme`               | `'rainbow'` | `rainbow` `neon` `okabeIto` `ocean` `fire` `gray` `paper`, or a `ColorScheme` object                                      |
 | `background`           | scheme bg   | any CSS color, or `'transparent'`                                                                                         |
-| `fps`                  | `60`        | simulation (and redraw) rate. 30 is usually indistinguishable as a background                                             |
+| `fps`                  | `30`        | simulation (and redraw) rate. 60 for smoother motion, at twice the CPU                                                    |
 | `maxPixelRatio`        | `2`         | caps canvas resolution on high-DPI screens                                                                                |
 | `paused`               | `false`     |                                                                                                                           |
 | `pauseWhenHidden`      | `true`      | stops while off-screen or the tab is hidden                                                                               |
