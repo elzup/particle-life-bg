@@ -4,7 +4,7 @@
  * @typedef {{
  *   types: number, count: number, matrix: string | number[][], seed: number | undefined,
  *   rMax: number, friction: number, force: number, drawStyle: string[],
- *   scheme: string, background: string | undefined, fps: number
+ *   scheme: string, colors: string[] | undefined, background: string | undefined, fps: number
  * }} PlaygroundState
  */
 
@@ -55,6 +55,7 @@ export const toOptions = (s, d = BASE_DEFAULTS) => {
         (styles.length === 1 ? styles[0] : styles),
     ],
     ['scheme', s.scheme !== d.scheme && s.scheme],
+    ['colors', s.colors !== undefined && s.colors.length > 0 && s.colors],
     ['background', s.background !== undefined && s.background],
     ['fps', s.fps !== d.fps && s.fps],
   ]

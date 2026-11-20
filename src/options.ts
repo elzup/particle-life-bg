@@ -32,6 +32,8 @@ export type Options = {
   drawStyle?: DrawStyle | readonly DrawStyle[]
   /** 配色。名前か ColorScheme を直接 */
   scheme?: SchemeName | ColorScheme
+  /** 種類ごとの色 (CSS の色)。scheme の色を置き換える。足りない分は先頭から繰り返す */
+  colors?: readonly string[]
   /** 地の色。'transparent' で下の要素を透かす。既定は配色の地 */
   background?: string
   /** 1 秒あたりのシミュレーション回数。背景なら 30 程度に落としても見た目はほぼ変わらない */
@@ -104,6 +106,39 @@ const resolveScheme = (scheme: Options['scheme']): ColorScheme => {
   return COLOR_SCHEMES[scheme] ?? COLOR_SCHEMES.rainbow
 }
 
+// 地の明るさ (0〜1) の境目。これより明るい地に加算合成すると白飛びして粒子が消える
+const LIGHT_BG_LUMINANCE = 0.5
+
+/** #rgb / #rrggbb の相対輝度。それ以外の書式は判定せず undefined (配色側の isLight を使う) */
+export const hexLuminance = (color: string): number | undefined => {
+  const m = /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(color.trim())
+  if (!m?.[1]) return undefined
+  const hex = m[1].length === 3 ? [...m[1]].map((c) => c + c).join('') : m[1]
+  const [r, g, b] = [0, 2, 4].map(
+    (i) => Number.parseInt(hex.slice(i, i + 2), 16) / 255
+  )
+  return 0.2126 * (r ?? 0) + 0.7152 * (g ?? 0) + 0.0722 * (b ?? 0)
+}
+
+// colors と background を配色に重ねる。地を変えたときは明暗も地に合わせ、発光の合成方法を正しく切り替える
+const withOverrides = (scheme: ColorScheme, o: Options): ColorScheme => {
+  const colors = o.colors?.filter((c) => c.trim() !== '') ?? []
+  const lum =
+    o.background === undefined || o.background === 'transparent'
+      ? undefined
+      : hexLuminance(o.background)
+
+  // 上書きが無ければ元の配色をそのまま返す (同じ配色かを参照で比べられるように)
+  if (colors.length === 0 && lum === undefined) return scheme
+  return {
+    ...scheme,
+    ...(colors.length > 0 && {
+      color: (t: number) => colors[t % colors.length] ?? scheme.fg,
+    }),
+    ...(lum !== undefined && { isLight: lum > LIGHT_BG_LUMINANCE }),
+  }
+}
+
 export const resolveOptions = (
   o: Options,
   rng: Rng = o.seed === undefined ? Math.random : seededRng(o.seed)
@@ -115,7 +150,7 @@ export const resolveOptions = (
     MAX_TYPES
   )
   const preset = typeof o.matrix === 'string' ? o.matrix : 'random'
-  const scheme = resolveScheme(o.scheme)
+  const scheme = withOverrides(resolveScheme(o.scheme), o)
 
   return {
     types,

@@ -11,6 +11,12 @@ import {
 const fromRecord = (r: Record<string, string>) => (a: string) => r[a] ?? null
 
 describe('parseAttribute', () => {
+  test('colors は空白区切りで、rgb() の中の空白では割らない', () => {
+    assert.deepEqual(
+      parseAttribute('colors', '#f00  rgb(0, 128, 255) hsl(10 50% 50%)'),
+      ['#f00', 'rgb(0, 128, 255)', 'hsl(10 50% 50%)']
+    )
+  })
   test('boolean は属性があれば true、"false" だけ false', () => {
     assert.equal(parseAttribute('boolean', ''), true)
     assert.equal(parseAttribute('boolean', 'false'), false)

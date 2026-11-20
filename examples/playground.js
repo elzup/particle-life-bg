@@ -44,6 +44,7 @@ const initialState = () => ({
   ...DEFAULTS,
   seed: Math.floor(Math.random() * SEED_RANGE),
   drawStyle: repeatTo(['dots'], DEFAULTS.types),
+  colors: undefined,
   background: undefined,
 })
 
@@ -94,6 +95,7 @@ const libOptions = (s) => ({
   force: s.force,
   drawStyle: s.drawStyle,
   scheme: s.scheme,
+  colors: s.colors,
   background: s.background,
   fps: s.fps,
   respectReducedMotion: false,
@@ -180,7 +182,8 @@ const buildStyleRows = () => {
 
 const schemePicker = createSchemePicker($('schemes'), {
   schemes: COLOR_SCHEMES,
-  onChange: (id) => commit({ scheme: id }),
+  // 配色を選び直したら、その配色の色で始め直す (手で選んだ色を残すと配色を選んだ意味が見えない)
+  onChange: (id) => commit({ scheme: id, colors: undefined }),
 })
 // 縮図は配色と種類数でしか変わらないので、スライダー操作のたびに描き直さない
 let schemePickerKey = ''
@@ -191,7 +194,50 @@ const syncSchemePicker = () => {
   schemePicker.render(state.scheme, state.types)
 }
 
-const schemeColor = (t) => COLOR_SCHEMES[state.scheme].color(t, state.types)
+// input type=color は #rrggbb しか受け付けないので、配色の hsl() などを canvas に解釈させて直す
+const hexCtx = document.createElement('canvas').getContext('2d')
+const toHex = (color) => {
+  hexCtx.fillStyle = '#000000'
+  hexCtx.fillStyle = color
+  const v = String(hexCtx.fillStyle)
+  return /^#[0-9a-f]{6}$/i.test(v) ? v : '#ffffff'
+}
+
+/** 種類 t の実際の色 (colors の上書き > 配色) */
+const schemeColor = (t) =>
+  state.colors?.length
+    ? state.colors[t % state.colors.length]
+    : COLOR_SCHEMES[state.scheme].color(t, state.types)
+
+const buildColorRow = () => {
+  const root = $('colors')
+  // 色を選んでいる最中に input を作り直すとピッカーが閉じるので、数が同じなら値だけ合わせる
+  if (root.children.length === state.types) {
+    for (const [i, input] of [...root.children].entries()) {
+      if (input !== document.activeElement) input.value = toHex(schemeColor(i))
+    }
+    $('reset-colors').hidden = !state.colors?.length
+    return
+  }
+  root.replaceChildren(
+    ...Array.from({ length: state.types }, (_, type) => {
+      const input = document.createElement('input')
+      input.type = 'color'
+      input.value = toHex(schemeColor(type))
+      input.title = `type ${type}`
+      input.setAttribute('aria-label', `type ${type}`)
+      // 1 色だけ変えても全種類ぶんを持つ (配色の色を起点に、その 1 色を差し替える)
+      input.oninput = () =>
+        commit({
+          colors: Array.from({ length: state.types }, (_, i) =>
+            i === type ? input.value : toHex(schemeColor(i))
+          ),
+        })
+      return input
+    })
+  )
+  $('reset-colors').hidden = !state.colors?.length
+}
 
 const syncControls = () => {
   for (const r of RANGES) {
@@ -211,6 +257,7 @@ const syncControls = () => {
   $('bg-color').disabled = $('bg-mode').value !== 'color'
   if ($('bg-mode').value === 'color') $('bg-color').value = state.background
   buildStyleRows()
+  buildColorRow()
 }
 
 const setRange = (key, value) => {
@@ -252,10 +299,11 @@ const bindControls = () => {
           ? undefined
           : mode === 'transparent'
             ? 'transparent'
-            : $('bg-color').value,
+            : toHex(COLOR_SCHEMES[state.scheme].bg),
     })
   }
   $('bg-color').oninput = (e) => commit({ background: e.target.value })
+  $('reset-colors').onclick = () => commit({ colors: undefined })
   $('sample').onchange = (e) => preview?.setSample(e.target.checked)
   $('reset').onclick = () => {
     state = initialState()

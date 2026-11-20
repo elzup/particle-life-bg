@@ -79,7 +79,8 @@ import { ParticleLifeBg } from 'particle-life-bg/react'
 | `force`                | `10`        | force multiplier                                                                                                          |
 | `drawStyle`            | `'dots'`    | `dots` `glow` `trail` `streak` `links` `mono` `speedGlow` `crowdGlow`, or an array per type (repeats)                     |
 | `scheme`               | `'rainbow'` | `rainbow` `neon` `okabeIto` `ocean` `fire` `gray` `paper`, or a `ColorScheme` object                                      |
-| `background`           | scheme bg   | any CSS color, or `'transparent'`                                                                                         |
+| `colors`               | scheme      | one CSS color per type (repeats), overriding the scheme colors. Attribute: space-separated                                |
+| `background`           | scheme bg   | any CSS color, or `'transparent'`. A light `#hex` switches glow to normal blending                                        |
 | `fps`                  | `30`        | simulation (and redraw) rate. 60 for smoother motion, at twice the CPU                                                    |
 | `maxPixelRatio`        | `2`         | caps canvas resolution on high-DPI screens                                                                                |
 | `paused`               | `false`     |                                                                                                                           |

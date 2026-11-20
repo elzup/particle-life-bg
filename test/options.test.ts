@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict'
 import { describe, test } from 'node:test'
 
-import { DEFAULTS, diffOptions, resolveOptions } from '../src/options.ts'
+import {
+  DEFAULTS,
+  diffOptions,
+  hexLuminance,
+  resolveOptions,
+} from '../src/options.ts'
 import { COLOR_SCHEMES } from '../src/palette.ts'
 
 describe('resolveOptions', () => {
@@ -72,5 +77,34 @@ describe('diffOptions', () => {
       respawn: true,
       rematrix: true,
     })
+  })
+})
+
+describe('colors / background の上書き', () => {
+  test('colors は種類ごとの色を置き換え、足りない分は繰り返す', () => {
+    const { scheme } = resolveOptions({ colors: ['#ff0000', '#00ff00'] })
+
+    assert.deepEqual(
+      [0, 1, 2].map((t) => scheme.color(t, 3)),
+      ['#ff0000', '#00ff00', '#ff0000']
+    )
+  })
+  test('空の colors は配色のまま', () => {
+    assert.equal(
+      resolveOptions({ colors: [] }).scheme.color(0, 5),
+      COLOR_SCHEMES.rainbow.color(0, 5)
+    )
+  })
+  test('明るい地を指定すると isLight になり、暗い地なら外れる', () => {
+    assert.equal(resolveOptions({ background: '#ffffff' }).scheme.isLight, true)
+    assert.equal(
+      resolveOptions({ scheme: 'paper', background: '#101010' }).scheme.isLight,
+      false
+    )
+  })
+  test('hexLuminance は 3 桁・6 桁だけ読む', () => {
+    assert.equal(hexLuminance('#fff'), 1)
+    assert.equal(hexLuminance('#000000'), 0)
+    assert.equal(hexLuminance('red'), undefined)
   })
 })

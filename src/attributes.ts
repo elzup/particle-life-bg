@@ -4,7 +4,7 @@ import type { SchemeName } from './palette.ts'
 import { DRAW_STYLES, type DrawStyle } from './render.ts'
 import type { Matrix } from './sim.ts'
 
-type Kind = 'number' | 'boolean' | 'string' | 'styles' | 'matrix'
+type Kind = 'number' | 'boolean' | 'string' | 'styles' | 'colors' | 'matrix'
 
 export type AttributeSpec = {
   /** HTML 属性名 (kebab-case) */
@@ -23,6 +23,7 @@ export const ATTRIBUTES: readonly AttributeSpec[] = [
   { attr: 'force', key: 'force', kind: 'number' },
   { attr: 'draw-style', key: 'drawStyle', kind: 'styles' },
   { attr: 'scheme', key: 'scheme', kind: 'string' },
+  { attr: 'colors', key: 'colors', kind: 'colors' },
   { attr: 'background', key: 'background', kind: 'string' },
   { attr: 'fps', key: 'fps', kind: 'number' },
   { attr: 'max-pixel-ratio', key: 'maxPixelRatio', kind: 'number' },
@@ -82,6 +83,11 @@ export const parseAttribute = (
     const list = raw.split(/[\s,]+/).filter(isDrawStyle)
     return list.length === 0 ? undefined : list
   }
+  // 色は rgb(…) のように中に空白やカンマを含みうるので、区切りは空白のみ・括弧の中は割らない
+  if (kind === 'colors') {
+    const list = raw.match(/[^\s(]+(\([^)]*\))?/g) ?? []
+    return list.length === 0 ? undefined : list
+  }
   if (kind === 'matrix') return parseMatrix(raw)
   return raw as SchemeName
 }
@@ -99,7 +105,7 @@ export const readAttributes = (
 
 const formatValue = (kind: Kind, v: unknown): string | null => {
   if (kind === 'boolean') return v === true ? null : 'false'
-  if (kind === 'styles') return [v].flat().join(' ')
+  if (kind === 'styles' || kind === 'colors') return [v].flat().join(' ')
   if (kind === 'matrix') return typeof v === 'string' ? v : JSON.stringify(v)
   return String(v)
 }

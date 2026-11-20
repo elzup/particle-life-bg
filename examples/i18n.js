@@ -17,6 +17,7 @@ const PARAM_JA = {
   scheme: '配色',
   background: '背景',
   drawStyle: '描き方',
+  colors: '色',
 }
 
 const MESSAGES = {
@@ -33,6 +34,9 @@ const MESSAGES = {
     bgColor: '色指定',
     sample: 'サンプル文字を重ねる',
     reset: '既定値に戻す',
+    resetColors: '配色に戻す',
+    colorsHint:
+      '種類ごとの色。押すと色を選べる。配色を選び直すと配色の色に戻る',
     codeHint:
       '既定値と同じものは省略。URL にも同じ設定が入るので、そのまま共有できる',
     perfTitle: '負荷の見積もり',
@@ -84,6 +88,9 @@ const MESSAGES = {
     bgColor: 'custom color',
     sample: 'Overlay sample text',
     reset: 'Reset to defaults',
+    resetColors: 'Use scheme colors',
+    colorsHint:
+      'One color per type. Click to pick. Choosing a scheme resets them',
     codeHint:
       'Values equal to the defaults are omitted. The URL carries the same settings, so you can share it as is',
     perfTitle: 'Load estimate',

@@ -163,6 +163,25 @@ button.quiet:hover {
 }
 
 /* 地と文字色はパネル側に固定し、配色の見た目は縮図の canvas だけで見せる (地の色で文字が読めなくなるのを避ける) */
+.colors-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.colors input[type="color"] {
+  width: 28px;
+  height: 24px;
+  padding: 1px;
+  cursor: pointer;
+}
+
 .scheme-card {
   display: grid;
   gap: 4px;
