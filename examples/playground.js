@@ -16,6 +16,7 @@ import {
 import { applyStatic, LANGS, labelParam, lang, switchLang, t } from './i18n.js'
 import { createMatrixEditor } from './matrix-editor.js'
 import { estimate, FORMATS, rate, stars } from './perf.js'
+import { createSchemePicker } from './scheme-picker.js'
 import { createStage } from './stage.js'
 
 const $ = (id) => document.getElementById(id)
@@ -156,6 +157,19 @@ const buildStyleRows = () => {
   )
 }
 
+const schemePicker = createSchemePicker($('schemes'), {
+  schemes: COLOR_SCHEMES,
+  onChange: (id) => commit({ scheme: id }),
+})
+// 縮図は配色と種類数でしか変わらないので、スライダー操作のたびに描き直さない
+let schemePickerKey = ''
+const syncSchemePicker = () => {
+  const key = `${state.scheme}:${state.types}`
+  if (key === schemePickerKey) return
+  schemePickerKey = key
+  schemePicker.render(state.scheme, state.types)
+}
+
 const schemeColor = (t) => COLOR_SCHEMES[state.scheme].color(t, state.types)
 
 const syncControls = () => {
@@ -163,7 +177,7 @@ const syncControls = () => {
     $(`r-${r.key}`).value = String(state[r.key])
     $(`o-${r.key}`).textContent = String(state[r.key])
   }
-  $('scheme').value = state.scheme
+  syncSchemePicker()
   $('fps').value = String(state.fps)
   $('matrix').value = Array.isArray(state.matrix) ? 'custom' : state.matrix
   $('seed').value = state.seed === undefined ? '' : String(state.seed)
@@ -189,11 +203,9 @@ const setRange = (key, value) => {
 }
 
 const bindControls = () => {
-  fillSelect($('scheme'), Object.keys(COLOR_SCHEMES), state.scheme)
   fillSelect($('fps'), [60, 30, 24, 15], state.fps)
   fillSelect($('matrix'), [...MATRIX_PRESETS, 'custom'], 'random')
   fillSelect($('style-all'), [t('perType'), ...DRAW_STYLES], t('perType'))
-  $('scheme').onchange = (e) => commit({ scheme: e.target.value })
   $('fps').onchange = (e) => commit({ fps: Number(e.target.value) })
   $('matrix').onchange = (e) => {
     if (e.target.value !== 'custom') commit({ matrix: e.target.value })

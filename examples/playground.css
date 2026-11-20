@@ -123,6 +123,72 @@ button.is-active:hover {
   color: var(--muted);
 }
 
+.field {
+  margin: 6px 0;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.schemes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+/* 地と文字色はパネル側に固定し、配色の見た目は縮図の canvas だけで見せる (地の色で文字が読めなくなるのを避ける) */
+.scheme-card {
+  display: grid;
+  gap: 4px;
+  padding: 4px;
+  text-align: left;
+  color: var(--text);
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.scheme-card:hover {
+  color: var(--text);
+  background: var(--surface-2);
+  border-color: var(--muted);
+}
+
+.scheme-card[aria-pressed="true"] {
+  border-color: var(--accent);
+}
+
+.scheme-card:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.scheme-card canvas {
+  width: 100%;
+  aspect-ratio: 136 / 64;
+  display: block;
+  border-radius: 3px;
+}
+
+.scheme-name {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.scheme-strip {
+  display: flex;
+  height: 5px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.scheme-strip i {
+  flex: 1;
+}
+
 .row.check {
   display: flex;
 }
