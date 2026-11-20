@@ -1,0 +1,17 @@
+[package]
+name = "particle-life-sim"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["cdylib"]
+path = "src/lib.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
+panic = "abort"
+# ベンチで JS と速さを比べるため、デバッグ情報で .wasm を太らせない
+strip = true

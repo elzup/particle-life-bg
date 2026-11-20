@@ -33,11 +33,15 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+      # ubuntu の runner には rustup が入っているので、wasm 用の target だけ足す
+      - run: rustup target add wasm32-unknown-unknown
+      - run: pnpm build:wasm
       - name: Assemble site
         run: |
           mkdir -p _site/lib
           cp -R examples _site/examples
           cp -R lib/esm _site/lib/esm
+          cp -R lib/wasm _site/lib/wasm
           printf '<!doctype html><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=./examples/"><a href="./examples/">playground</a>\n' > _site/index.html
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v4

@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>particle-life-bg sim bench</title>
+    <link rel="stylesheet" href="./playground.css" />
+    <style>
+      body {
+        display: block;
+        height: auto;
+        padding: 16px;
+      }
+      .bench {
+        max-width: 720px;
+        display: grid;
+        gap: 12px;
+      }
+      .bench table {
+        border-collapse: collapse;
+        font-variant-numeric: tabular-nums;
+      }
+      .bench th,
+      .bench td {
+        padding: 4px 10px;
+        border-bottom: 1px solid var(--border);
+        text-align: right;
+      }
+      .bench th:first-child,
+      .bench td:first-child {
+        text-align: left;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="bench">
+      <h1>sim bench: JS / WASM / WASM SIMD</h1>
+      <p class="hint">
+        計算部分 (step) だけを比べる。描画は含まない。5 種類・16:9・rMax 0.1、60 step 助走してから 120 step の中央値。
+        WASM SIMD は粒子をセル順に並べ替えた写しも使うので、SIMD 命令とメモリの並びの両方の効果が入っている
+      </p>
+      <div><button id="run" type="button">run</button> <span id="status" class="hint"></span></div>
+      <table>
+        <thead><tr><th>粒子数</th><th>JS</th><th>WASM</th><th>WASM SIMD</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+      <p id="env" class="hint"></p>
+      <p><a class="gh" href="./">← playground</a></p>
+    </main>
+
+    <script type="module">
+      // pnpm build && pnpm build:wasm してから、リポのルートで静的サーバーを立てて開く
+      import * as lib from '../lib/esm/index.js'
+      import { maxDrift, runBench } from './bench-core.js'
+      import { loadWasmSim } from './wasm-sim.js'
+
+      const $ = (id) => document.getElementById(id)
+      const fetchBytes = async (file) => {
+        const res = await fetch(`../lib/wasm/${file}`)
+        if (!res.ok) throw new Error(`${file}: HTTP ${res.status}`)
+        return res.arrayBuffer()
+      }
+      // 計測中は描画が止まるので、ボタンの表示を更新してから 1 フレーム譲ってから始める
+      const nextFrame = () => new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)))
+
+      $('env').textContent = navigator.userAgent
+      $('run').onclick = async () => {
+        $('run').disabled = true
+        $('status').textContent = 'running…'
+        await nextFrame()
+        try {
+          const wasms = [
+            { name: 'WASM', sim: await loadWasmSim(await fetchBytes('sim.wasm')) },
+            { name: 'WASM SIMD', sim: await loadWasmSim(await fetchBytes('sim-simd.wasm')) },
+          ]
+          const drift = wasms.map((w) => `${w.name} ${maxDrift(lib, w.sim).toExponential(1)}`)
+          const rows = runBench(lib, wasms, () => performance.now())
+          $('rows').replaceChildren(
+            ...rows.map((row) => {
+              const tr = document.createElement('tr')
+              const cells = [
+                String(row.count),
+                ...row.results.map((r) => `${r.ms.toFixed(2)} ms (×${r.speedup.toFixed(2)})`),
+              ]
+              tr.replaceChildren(
+                ...cells.map((text) => {
+                  const td = document.createElement('td')
+                  td.textContent = text
+                  return td
+                })
+              )
+              return tr
+            })
+          )
+          $('status').textContent = `done. JS とのずれ: ${drift.join(' / ')}`
+        } catch (e) {
+          console.error('bench: 実行できなかった', e)
+          $('status').textContent = `failed: ${e.message}`
+        } finally {
+          $('run').disabled = false
+        }
+      }
+    </script>
+  </body>
+</html>
