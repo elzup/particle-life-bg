@@ -21,6 +21,12 @@ describe('toOptions', () => {
   test('既定値だけなら空', () => {
     assert.deepEqual(toOptions(base), {})
   })
+  test('colors は指定したときだけ出る', () => {
+    assert.deepEqual(toOptions({ ...base, colors: ['#ff0000'] }), {
+      colors: ['#ff0000'],
+    })
+    assert.deepEqual(toOptions({ ...base, colors: [] }), {})
+  })
   test('違う値だけ残る', () => {
     assert.deepEqual(
       toOptions({ ...base, count: 800, scheme: 'neon', seed: 3 }),

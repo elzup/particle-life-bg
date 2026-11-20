@@ -4,7 +4,7 @@
  * @typedef {{
  *   types: number, count: number, matrix: string | number[][], seed: number | undefined,
  *   rMax: number, friction: number, force: number, drawStyle: string[],
- *   scheme: string, colors: string[] | undefined, background: string | undefined, fps: number
+ *   scheme: string, colors?: string[], background: string | undefined, fps: number
  * }} PlaygroundState
  */
 
