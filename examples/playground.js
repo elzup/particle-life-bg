@@ -145,7 +145,12 @@ const fillPresets = (container, values, onPick) => {
       const b = document.createElement('button')
       b.type = 'button'
       b.dataset.value = String(v)
-      b.textContent = String(v)
+      // 段の点と値の文字を 1 つのボタンに入れ、どちらを押しても選べるようにする
+      const dot = document.createElement('span')
+      const text = document.createElement('span')
+      dot.className = 'stop-dot'
+      text.textContent = String(v)
+      b.append(dot, text)
       b.onclick = () => onPick(v)
       return b
     })
@@ -188,6 +193,8 @@ const buildRanges = () => {
   )
 }
 
+const isSwitchOn = (el) => el.getAttribute('aria-checked') === 'true'
+
 const readDetail = () => {
   try {
     return localStorage.getItem(DETAIL_KEY) === '1'
@@ -199,7 +206,7 @@ const readDetail = () => {
 
 const setDetail = (isDetail) => {
   $('ranges').classList.toggle('is-detail', isDetail)
-  $('detail').checked = isDetail
+  $('detail').setAttribute('aria-checked', String(isDetail))
   try {
     localStorage.setItem(DETAIL_KEY, isDetail ? '1' : '0')
   } catch (e) {
@@ -341,7 +348,7 @@ const setRange = (key, value) => {
 
 const bindControls = () => {
   fillPresets($('p-fps'), FPS_PRESETS, (fps) => commit({ fps }))
-  $('detail').onchange = (e) => setDetail(e.target.checked)
+  $('detail').onclick = () => setDetail(!isSwitchOn($('detail')))
   setDetail(readDetail())
   fillSelect($('matrix'), [...MATRIX_PRESETS, 'custom'], 'random')
   fillSelect($('style-all'), [t('perType'), ...DRAW_STYLES], t('perType'))
@@ -374,7 +381,11 @@ const bindControls = () => {
   }
   $('bg-color').oninput = (e) => commit({ background: e.target.value })
   $('reset-colors').onclick = () => commit({ colors: undefined })
-  $('sample').onchange = (e) => preview?.setSample(e.target.checked)
+  $('sample').onclick = () => {
+    const isShown = !isSwitchOn($('sample'))
+    $('sample').setAttribute('aria-checked', String(isShown))
+    preview?.setSample(isShown)
+  }
   $('reset').onclick = () => {
     state = initialState()
     applyAll()
@@ -497,15 +508,17 @@ const stage = createStage(
   $('stage'),
   (p) => {
     preview = p
-    p.setSample($('sample').checked)
+    p.setSample(isSwitchOn($('sample')))
     applyAll()
   },
   { foldLabel: t('fold') }
 )
 
 const markActive = (container, attr, value) => {
-  for (const b of container.querySelectorAll('button'))
+  for (const b of container.querySelectorAll('button')) {
     b.classList.toggle('is-active', b.dataset[attr] === value)
+    b.setAttribute('aria-pressed', String(b.dataset[attr] === value))
+  }
 }
 
 const selectFormat = (id) => {
