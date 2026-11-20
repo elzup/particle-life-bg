@@ -28,13 +28,36 @@ const METER_INTERVAL_MS = 1000
 // copy ボタンの表示を戻すまで。押せたことが目で追える長さ
 const COPY_FEEDBACK_MS = 1200
 
+// presets は既定値を含め、見た目の違いがはっきり出る間隔で選ぶ。細かい値は「詳細」のスライダーで
 const RANGES = [
-  { key: 'count', min: 100, max: 5000, step: 100 },
-  { key: 'types', min: 2, max: 12, step: 1 },
-  { key: 'rMax', min: 0.02, max: 0.3, step: 0.005 },
-  { key: 'friction', min: 0.005, max: 0.2, step: 0.005 },
-  { key: 'force', min: 1, max: 30, step: 0.5 },
+  {
+    key: 'count',
+    min: 100,
+    max: 5000,
+    step: 100,
+    presets: [500, 1500, 3000, 5000],
+  },
+  { key: 'types', min: 2, max: 12, step: 1, presets: [3, 5, 7, 10] },
+  {
+    key: 'rMax',
+    min: 0.02,
+    max: 0.3,
+    step: 0.005,
+    presets: [0.05, 0.1, 0.15, 0.2],
+  },
+  {
+    key: 'friction',
+    min: 0.005,
+    max: 0.2,
+    step: 0.005,
+    presets: [0.01, 0.04, 0.08, 0.15],
+  },
+  { key: 'force', min: 1, max: 30, step: 0.5, presets: [5, 10, 20, 30] },
 ]
+const FPS_PRESETS = [60, 30, 24, 15]
+const DETAIL_KEY = 'particle-life-bg:detail'
+// スライダーの値は step の丸めで浮動小数の誤差が乗るので、比較は step より十分小さい幅で
+const PRESET_EPS = 1e-6
 
 const repeatTo = (list, n) =>
   Array.from({ length: n }, (_, i) => list[i % list.length] ?? 'dots')
@@ -74,6 +97,7 @@ const fromHash = (base) => {
 
 let state = fromHash(initialState())
 let formatId = 'desktop'
+let fitMode = 'contain'
 let codeTab = 'html'
 // 生成する CDN URL に埋める版。取れなければ利用者に書き換えてもらう印を残す
 const pkgVersion = await fetch('../package.json')
@@ -115,6 +139,27 @@ const fillSelect = (el, values, value) => {
   el.value = String(value)
 }
 
+const fillPresets = (container, values, onPick) => {
+  container.replaceChildren(
+    ...values.map((v) => {
+      const b = document.createElement('button')
+      b.type = 'button'
+      b.dataset.value = String(v)
+      b.textContent = String(v)
+      b.onclick = () => onPick(v)
+      return b
+    })
+  )
+}
+
+const markPreset = (container, value) => {
+  for (const b of container.querySelectorAll('button'))
+    b.classList.toggle(
+      'is-active',
+      Math.abs(Number(b.dataset.value) - value) < PRESET_EPS
+    )
+}
+
 const buildRanges = () => {
   $('ranges').replaceChildren(
     ...RANGES.map((r) => {
@@ -133,10 +178,33 @@ const buildRanges = () => {
       input.id = `r-${r.key}`
       out.id = `o-${r.key}`
       input.oninput = () => setRange(r.key, Number(input.value))
-      row.append(name, input, out)
+      const presets = document.createElement('div')
+      presets.className = 'presets'
+      presets.id = `p-${r.key}`
+      fillPresets(presets, r.presets, (v) => setRange(r.key, v))
+      row.append(name, presets, input, out)
       return row
     })
   )
+}
+
+const readDetail = () => {
+  try {
+    return localStorage.getItem(DETAIL_KEY) === '1'
+  } catch (e) {
+    console.error('playground: 詳細表示の設定を読めなかった', e)
+    return false
+  }
+}
+
+const setDetail = (isDetail) => {
+  $('ranges').classList.toggle('is-detail', isDetail)
+  $('detail').checked = isDetail
+  try {
+    localStorage.setItem(DETAIL_KEY, isDetail ? '1' : '0')
+  } catch (e) {
+    console.error('playground: 詳細表示の設定を保存できなかった', e)
+  }
 }
 
 // 種類ごとの描き方は 8 択を一目で比べられるよう、select ではなく 1 行の radio (短い記号) で並べる
@@ -243,9 +311,10 @@ const syncControls = () => {
   for (const r of RANGES) {
     $(`r-${r.key}`).value = String(state[r.key])
     $(`o-${r.key}`).textContent = String(state[r.key])
+    markPreset($(`p-${r.key}`), state[r.key])
   }
   syncSchemePicker()
-  $('fps').value = String(state.fps)
+  markPreset($('p-fps'), state.fps)
   $('matrix').value = Array.isArray(state.matrix) ? 'custom' : state.matrix
   $('seed').value = state.seed === undefined ? '' : String(state.seed)
   $('bg-mode').value =
@@ -271,10 +340,11 @@ const setRange = (key, value) => {
 }
 
 const bindControls = () => {
-  fillSelect($('fps'), [60, 30, 24, 15], state.fps)
+  fillPresets($('p-fps'), FPS_PRESETS, (fps) => commit({ fps }))
+  $('detail').onchange = (e) => setDetail(e.target.checked)
+  setDetail(readDetail())
   fillSelect($('matrix'), [...MATRIX_PRESETS, 'custom'], 'random')
   fillSelect($('style-all'), [t('perType'), ...DRAW_STYLES], t('perType'))
-  $('fps').onchange = (e) => commit({ fps: Number(e.target.value) })
   $('matrix').onchange = (e) => {
     if (e.target.value !== 'custom') commit({ matrix: e.target.value })
   }
@@ -423,11 +493,15 @@ const renderMeter = () => {
 
 // ---- フォーマット / コード切替 ----
 
-const stage = createStage($('stage'), (p) => {
-  preview = p
-  p.setSample($('sample').checked)
-  applyAll()
-})
+const stage = createStage(
+  $('stage'),
+  (p) => {
+    preview = p
+    p.setSample($('sample').checked)
+    applyAll()
+  },
+  { foldLabel: t('fold') }
+)
 
 const markActive = (container, attr, value) => {
   for (const b of container.querySelectorAll('button'))
@@ -440,6 +514,8 @@ const selectFormat = (id) => {
     id === 'fit' ? null : (FORMATS.find((f) => f.id === id) ?? null)
   )
   markActive($('formats'), 'format', id)
+  // Fit は stage いっぱいに描くので、全体 / 1 画面の切り替えは意味がない
+  $('fits').hidden = id === 'fit'
   renderPerf()
 }
 
@@ -454,6 +530,17 @@ const buildFormatTabs = () => {
       return b
     })
   )
+}
+
+const bindFitTabs = () => {
+  for (const b of $('fits').querySelectorAll('button')) {
+    b.onclick = () => {
+      fitMode = b.dataset.fit
+      stage.setFit(fitMode)
+      markActive($('fits'), 'fit', fitMode)
+    }
+  }
+  markActive($('fits'), 'fit', fitMode)
 }
 
 const bindCodeTabs = () => {
@@ -498,6 +585,7 @@ buildLangTabs()
 buildRanges()
 bindControls()
 buildFormatTabs()
+bindFitTabs()
 bindCodeTabs()
 selectFormat(formatId)
 syncControls()

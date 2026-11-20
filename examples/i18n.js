@@ -33,6 +33,10 @@ const MESSAGES = {
     bgScheme: 'scheme の地',
     bgColor: '色指定',
     sample: 'サンプル文字を重ねる',
+    detail: '詳細',
+    fitContain: 'ページ全体 (スクロールぶん込み) を収めて表示',
+    fitCover: '1 画面ぶんを大きく表示し、続きはスクロールで見る',
+    fold: 'ここから下はスクロールで見える部分',
     reset: '既定値に戻す',
     resetColors: '配色に戻す',
     colorsHint:
@@ -87,6 +91,10 @@ const MESSAGES = {
     bgScheme: 'scheme background',
     bgColor: 'custom color',
     sample: 'Overlay sample text',
+    detail: 'Fine-tune',
+    fitContain: 'Fit the whole page, including the scrolled part',
+    fitCover: 'Fill with one screen; scroll to see the rest',
+    fold: 'Below the fold (visible after scrolling)',
     reset: 'Reset to defaults',
     resetColors: 'Use scheme colors',
     colorsHint:
@@ -172,13 +180,15 @@ export const labelParam = (el, name) => {
   el.replaceChildren(ruby)
 }
 
-/** data-i18n (textContent) / data-i18n-placeholder / data-param を埋め、<html lang> を合わせる */
+/** data-i18n (textContent) / data-i18n-placeholder / data-i18n-title / data-param を埋め、<html lang> を合わせる */
 export const applyStatic = (root = document) => {
   document.documentElement.lang = lang
   for (const el of root.querySelectorAll('[data-i18n]'))
     el.textContent = t(el.dataset.i18n)
   for (const el of root.querySelectorAll('[data-i18n-placeholder]'))
     el.placeholder = t(el.dataset.i18nPlaceholder)
+  for (const el of root.querySelectorAll('[data-i18n-title]'))
+    el.title = t(el.dataset.i18nTitle)
   for (const el of root.querySelectorAll('[data-param]'))
     labelParam(el, el.dataset.param)
 }

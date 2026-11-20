@@ -140,6 +140,42 @@ button.quiet:hover {
   margin: 4px 0;
 }
 
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.section-head h2 {
+  margin: 0;
+}
+
+/* 既定は代表値のボタンだけ。「詳細」でスライダーに切り替える (細かい値は使う人が限られる) */
+.presets {
+  display: grid;
+  grid-auto-columns: 1fr;
+  grid-auto-flow: column;
+  gap: 2px;
+}
+
+.presets button {
+  padding: 3px 0;
+  font: 11px var(--mono);
+}
+
+.ranges .row input[type="range"] {
+  display: none;
+}
+
+.ranges.is-detail .row input[type="range"] {
+  display: block;
+}
+
+.ranges.is-detail .presets {
+  display: none;
+}
+
 .row output {
   min-width: 44px;
   text-align: right;
@@ -404,6 +440,8 @@ fieldset.field {
   min-height: 0;
   display: grid;
   place-items: center;
+  /* 端末の枠を外側に描く余白。stage.js の BEZEL_PAD_PX と揃える */
+  padding: 14px;
   overflow: hidden;
   background:
     repeating-conic-gradient(var(--surface) 0 25%, var(--bg) 0 50%) 0 0 / 16px
@@ -421,8 +459,58 @@ fieldset.field {
   color: var(--muted);
 }
 
+/* cover は 1 画面ぶんを大きく見せ、続きは stage の中でスクロールして見る */
+.stage[data-fit="cover"] {
+  align-items: start;
+  overflow: auto;
+}
+
 .frame-holder {
+  position: relative;
+}
+
+.frame-clip {
+  width: 100%;
+  height: 100%;
   overflow: hidden;
+}
+
+/* 最初の 1 画面を囲う端末の枠。外側に影で描き、中の操作は iframe に通す */
+.device-screen {
+  position: absolute;
+  inset: 0 0 auto;
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 6px var(--surface-2),
+    0 0 0 7px var(--border);
+  pointer-events: none;
+}
+
+.device-screen[data-device="mobile"],
+.device-screen[data-device="tablet"] {
+  border-radius: 10px;
+  box-shadow:
+    0 0 0 9px var(--surface-2),
+    0 0 0 10px var(--border);
+}
+
+/* 枠より下 = スクロールしないと見えない部分。少し暗くして 1 画面目と見分ける */
+.device-fold {
+  position: absolute;
+  inset: auto 0 0;
+  background: rgb(0 0 0 / 0.4);
+  pointer-events: none;
+}
+
+.device-fold::before {
+  content: "↓ " attr(data-label);
+  position: absolute;
+  top: 12px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font: 11px var(--mono);
+  color: var(--muted);
 }
 
 .frame-holder iframe {

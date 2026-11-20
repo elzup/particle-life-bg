@@ -18,9 +18,12 @@
       </header>
 
       <section>
-        <h2 data-i18n="simulation">シミュレーション</h2>
-        <div id="ranges"></div>
-        <label class="row"><span data-param="fps">fps</span><select id="fps"></select></label>
+        <div class="section-head">
+          <h2 data-i18n="simulation">シミュレーション</h2>
+          <label class="check"><input id="detail" type="checkbox" /> <span data-i18n="detail">詳細</span></label>
+        </div>
+        <div id="ranges" class="ranges"></div>
+        <div class="row"><span data-param="fps">fps</span><div id="p-fps" class="presets"></div></div>
       </section>
 
       <section>
@@ -74,6 +77,10 @@
     <main class="main">
       <div class="toolbar">
         <nav id="formats" class="tabs" aria-label="preview format"></nav>
+        <nav id="fits" class="tabs" aria-label="preview fit">
+          <button type="button" data-fit="contain" data-i18n-title="fitContain">contain</button>
+          <button type="button" data-fit="cover" data-i18n-title="fitCover">cover</button>
+        </nav>
         <label class="check"><input id="sample" type="checkbox" checked /> <span data-i18n="sample">サンプル文字を重ねる</span></label>
       </div>
       <div id="stage" class="stage"></div>

@@ -11,23 +11,46 @@
         overflow: hidden;
         font-family: system-ui, sans-serif;
       }
-      .hero {
+      body {
         position: relative;
-        height: 100%;
-        display: grid;
-        place-items: center;
+      }
+      /* ライブラリの canvas はこの要素いっぱい = ページ全体 (スクロールぶん込み) に敷く */
+      .bg {
+        position: absolute;
+        inset: 0;
       }
       .sample {
         position: relative;
-        text-align: center;
         color: #fff;
         text-shadow: 0 1px 8px rgb(0 0 0 / 0.6);
       }
-      .sample h1 {
+      /* 見出しは実際のページと同じく最初の 1 画面の中央。--screens は親 (stage.js) が入れる */
+      .hero {
+        /* iframe の中なので 100vh = ページ全体の高さ。% は親の高さが auto で効かない */
+        height: calc(100vh / var(--screens, 1));
+        display: grid;
+        place-items: center;
+        text-align: center;
+      }
+      .article {
+        max-width: 40rem;
+        margin: 0 auto;
+        padding: 0 1.5rem;
+        line-height: 1.8;
+      }
+      .article h2 {
+        margin: 2.5em 0 0.5em;
+        font-size: clamp(1.1rem, 3vw, 1.6rem);
+      }
+      .article p {
+        margin: 0;
+        opacity: 0.85;
+      }
+      .hero h1 {
         margin: 0;
         font-size: clamp(1.5rem, 6vw, 4.5rem);
       }
-      .sample p {
+      .hero p {
         margin: 0.5em 0 0;
         font-size: clamp(0.9rem, 2vw, 1.25rem);
         opacity: 0.85;
@@ -38,12 +61,22 @@
     </style>
   </head>
   <body>
-    <section class="hero" id="hero">
-      <div class="sample" id="sample">
-        <h1>particle-life-bg</h1>
-        <p>Cells, chains and chasers emerge on their own.</p>
-      </div>
-    </section>
+    <div class="bg" id="bg"></div>
+    <div class="sample" id="sample">
+      <section class="hero">
+        <div>
+          <h1>particle-life-bg</h1>
+          <p>Cells, chains and chasers emerge on their own.</p>
+        </div>
+      </section>
+      <!-- 2 画面目以降。背景がスクロール先まで続いて見えるかを確かめるためのダミー本文 -->
+      <article class="article">
+        <h2>Simple rules, living patterns</h2>
+        <p>Each particle only feels its neighbours: types attract or repel each other with their own strengths. Nothing else is programmed, yet clusters form, chase one another and split again.</p>
+        <h2>A background, not a show</h2>
+        <p>The simulation pauses when it scrolls out of view or the tab is hidden, and draws a still frame when the reader prefers reduced motion.</p>
+      </article>
+    </div>
 
     <script type="module">
       // 親 (playground) が同一オリジンなので window.preview を直接叩く。実寸で描くため iframe に分けている
@@ -75,7 +108,7 @@
       rawRaf(tick)
 
       // 調整中に止まると分からないので、OS の reduced motion 設定でも動かす
-      const bg = mount(document.getElementById('hero'), { respectReducedMotion: false })
+      const bg = mount(document.getElementById('bg'), { respectReducedMotion: false })
 
       window.preview = {
         bg,
