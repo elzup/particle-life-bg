@@ -36,10 +36,10 @@
 
       <section>
         <h2 data-i18n="drawing">描画</h2>
-        <div class="field">
-          <span class="field-label" data-param="scheme">scheme</span>
-          <div id="schemes" class="schemes" role="group" aria-label="scheme"></div>
-        </div>
+        <fieldset class="field">
+          <legend class="field-label" data-param="scheme">scheme</legend>
+          <div id="schemes" class="schemes"></div>
+        </fieldset>
         <label class="row">
           <span data-param="background">background</span>
           <select id="bg-mode">
@@ -51,6 +51,7 @@
         </label>
         <label class="row"><span data-param="drawStyle">drawStyle</span><select id="style-all"></select></label>
         <div id="styles" class="styles"></div>
+        <p id="style-legend" class="hint style-legend"></p>
       </section>
 
       <section>

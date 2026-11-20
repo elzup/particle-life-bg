@@ -137,24 +137,45 @@ const buildRanges = () => {
   )
 }
 
+// 種類ごとの描き方は 8 択を一目で比べられるよう、select ではなく 1 行の radio (短い記号) で並べる
+const styleRadio = (type, style, current) => {
+  const label = document.createElement('label')
+  const input = document.createElement('input')
+  const text = document.createElement('span')
+  input.type = 'radio'
+  input.name = `draw-style-${type}`
+  input.value = style
+  input.checked = style === current
+  input.onchange = () =>
+    commit({
+      drawStyle: state.drawStyle.map((s, i) => (i === type ? style : s)),
+    })
+  text.textContent = t(`style.${style}.short`)
+  label.className = 'seg'
+  label.title = `${style}: ${t(`style.${style}.name`)}`
+  label.append(input, text)
+  return label
+}
+
 const buildStyleRows = () => {
   $('styles').replaceChildren(
-    ...state.drawStyle.map((style, t) => {
-      const sel = document.createElement('select')
+    ...state.drawStyle.map((current, type) => {
+      const row = document.createElement('div')
       const chip = document.createElement('span')
-      const row = document.createElement('label')
+      const group = document.createElement('div')
       chip.className = 'chip'
-      chip.style.background = schemeColor(t)
-      fillSelect(sel, DRAW_STYLES, style)
-      sel.onchange = () =>
-        commit({
-          drawStyle: state.drawStyle.map((s, i) => (i === t ? sel.value : s)),
-        })
-      row.className = 'row style-row'
-      row.append(chip, sel)
+      chip.style.background = schemeColor(type)
+      group.className = 'segs'
+      group.setAttribute('aria-label', `type ${type}`)
+      group.append(...DRAW_STYLES.map((s) => styleRadio(type, s, current)))
+      row.className = 'style-row'
+      row.append(chip, group)
       return row
     })
   )
+  $('style-legend').textContent = DRAW_STYLES.map(
+    (s) => `${t(`style.${s}.short`)}: ${t(`style.${s}.name`)}`
+  ).join(' / ')
 }
 
 const schemePicker = createSchemePicker($('schemes'), {

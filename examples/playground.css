@@ -201,12 +201,69 @@ button.is-active:hover {
 
 .styles {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px 8px;
+  gap: 3px;
+  margin-top: 4px;
 }
 
 .style-row {
+  display: grid;
   grid-template-columns: 12px 1fr;
+  gap: 8px;
+  align-items: center;
+}
+
+.segs {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.seg {
+  position: relative;
+  display: grid;
+  place-items: center;
+  padding: 2px 0;
+  font-size: 11px;
+  color: var(--muted);
+  background: var(--surface);
+  cursor: pointer;
+}
+
+.seg + .seg {
+  border-left: 1px solid var(--border);
+}
+
+/* radio 自体は隠し、ラベル全体を押せる面にする (キーボード操作と読み上げは input が担う) */
+.seg input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.seg:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+
+.seg:has(input:checked) {
+  color: var(--accent-text);
+  background: var(--accent);
+}
+
+.seg:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+.style-legend {
+  line-height: 1.6;
+}
+
+fieldset.field {
+  padding: 0;
+  border: 0;
 }
 
 .chip {
