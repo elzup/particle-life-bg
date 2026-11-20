@@ -44,6 +44,19 @@
         <thead><tr><th>粒子数</th><th>JS</th><th>WASM</th><th>WASM SIMD</th></tr></thead>
         <tbody id="rows"></tbody>
       </table>
+      <h2>draw bench: Canvas 2D の描き方ごと</h2>
+      <p class="hint">
+        1440×810 (CSS px)、dpr は min(2, 端末)。全種類を同じ描き方にし、120 step 進めて塊ができた状態を 40 フレーム描いた中央値。
+        数値は「GPU の実行まで待った時間 (JS が命令を積んだ時間)」。計算の表と足すと 1 フレームの CPU 時間の目安になる
+      </p>
+      <div><button id="run-draw" type="button">run draw</button> <span id="draw-status" class="hint"></span></div>
+      <div style="overflow-x: auto">
+        <table>
+          <thead id="draw-head"></thead>
+          <tbody id="draw-rows"></tbody>
+        </table>
+      </div>
+      <canvas id="draw-canvas" style="width: 100%; max-width: 720px; aspect-ratio: 16 / 9"></canvas>
       <p id="env" class="hint"></p>
       <p><a class="gh" href="./">← playground</a></p>
     </main>
@@ -51,7 +64,8 @@
     <script type="module">
       // pnpm build && pnpm build:wasm してから、リポのルートで静的サーバーを立てて開く
       import * as lib from '../lib/esm/index.js'
-      import { maxDrift, runBench } from './bench-core.js'
+      import { COUNTS, maxDrift, runBench } from './bench-core.js'
+      import { runDrawBench } from './draw-bench.js'
       import { loadWasmSim } from './wasm-sim.js'
 
       const $ = (id) => document.getElementById(id)
@@ -62,6 +76,46 @@
       }
       // 計測中は描画が止まるので、ボタンの表示を更新してから 1 フレーム譲ってから始める
       const nextFrame = () => new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0)))
+
+      const row = (cells, tag = 'td') => {
+        const tr = document.createElement('tr')
+        tr.replaceChildren(
+          ...cells.map((text) => {
+            const el = document.createElement(tag)
+            el.textContent = text
+            return el
+          })
+        )
+        return tr
+      }
+
+      $('run-draw').onclick = async () => {
+        $('run-draw').disabled = true
+        try {
+          const result = await runDrawBench(lib, $('draw-canvas'), COUNTS, (msg) => {
+            $('draw-status').textContent = `running… ${msg}`
+          })
+          $('draw-head').replaceChildren(row(['drawStyle', ...result.rows.map((r) => `${r.count} 粒子`)], 'th'))
+          const styles = result.rows[0]?.cells.map((c) => c.style) ?? []
+          $('draw-rows').replaceChildren(
+            ...styles.map((style, k) =>
+              row([
+                style,
+                ...result.rows.map((r) => {
+                  const c = r.cells[k]
+                  return `${c.flush.toFixed(2)} ms (${c.submit.toFixed(2)})`
+                }),
+              ])
+            )
+          )
+          $('draw-status').textContent = `done. dpr ${result.pixelRatio}`
+        } catch (e) {
+          console.error('draw bench: 実行できなかった', e)
+          $('draw-status').textContent = `failed: ${e.message}`
+        } finally {
+          $('run-draw').disabled = false
+        }
+      }
 
       $('env').textContent = navigator.userAgent
       $('run').onclick = async () => {
