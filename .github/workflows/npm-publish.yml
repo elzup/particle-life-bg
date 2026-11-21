@@ -38,5 +38,16 @@ jobs:
           sed -i '/:_authToken=/d; /always-auth/d' "$NPM_CONFIG_USERCONFIG"
           echo "--- .npmrc after strip ---"
           cat "$NPM_CONFIG_USERCONFIG"
-      - run: pnpm install --frozen-lockfile
-      - run: npm publish # npm CLI (not pnpm) so the OIDC handshake runs; prepublishOnly runs build + tests
+      # 初回のように手動で公開済みの版に後から tag を付けても、二重公開で失敗させない
+      - name: Skip if this version is already on npm
+        id: published
+        run: |
+          v=$(node -p "require('./package.json').version")
+          if npm view "$(node -p "require('./package.json').name")@$v" version >/dev/null 2>&1; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "$v is already on npm, skipping publish"
+          fi
+      - if: steps.published.outputs.skip != 'true'
+        run: pnpm install --frozen-lockfile
+      - if: steps.published.outputs.skip != 'true'
+        run: npm publish # npm CLI (not pnpm) so the OIDC handshake runs; prepublishOnly runs build + tests
