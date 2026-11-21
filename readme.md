@@ -130,6 +130,17 @@ $ npx serve .                     # then open /examples/bench.html for the same 
 
 The browser bench is also deployed at https://elzup.github.io/particle-life-bg/examples/bench.html and measures the device that opens it.
 
+## Credits
+
+This library is an independent implementation, and it stands on the work of people who explored this idea before. With thanks to:
+
+- **Jeffrey Ventrella** — [Clusters](https://www.ventrella.com/Clusters/) (around 2016), particles of several types with asymmetric attraction rules. His page notes that it inspired Tom Mohr's Particle Life.
+- **CodeParade (HackerPoet)** — [Particle Life - A Game of Life Made of Particles](https://youtu.be/Z_zmZ23grXE) (video) and [source code](https://github.com/HackerPoet/Particle-Life) (MIT).
+- **Tom Mohr** — [particle-life.com](https://particle-life.com/) (GPL-3.0), with the videos [How Particle Life emerges from simplicity](https://youtu.be/p4YirERTVF0) and [The code behind Particle Life](https://youtu.be/scvuli-zcRc).
+- **Hunar Ahmad** — [hunar4321/particle-life](https://github.com/hunar4321/particle-life) (MIT), a compact implementation that credits Ventrella's Clusters.
+
+No code is copied from these projects. The force curve and the friction model follow the form commonly used in Particle Life implementations.
+
 ## License
 
 MIT © [anozon](https://anozon.me)
