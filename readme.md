@@ -1,6 +1,3 @@
-
-
-
 # particle-life-bg
 
 ![min+gzip](https://img.shields.io/badge/min%2Bgzip-5.7%20kB-informational)
