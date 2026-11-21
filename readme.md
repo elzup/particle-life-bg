@@ -1,3 +1,6 @@
+
+
+
 # particle-life-bg
 
 ![min+gzip](https://img.shields.io/badge/min%2Bgzip-5.7%20kB-informational)
@@ -5,6 +8,8 @@
 > Particle Life (asymmetric attraction) animated canvas background. Zero-dependency core with an optional React component.
 
 Each particle type is attracted to or repelled by the other types according to an asymmetric matrix. Cells, chains and chasers emerge on their own.
+
+https://github.com/user-attachments/assets/1158e60e-dd3b-4d45-a922-c3b606c9a3d5
 
 **Playground:** https://elzup.github.io/particle-life-bg/ — tune the options and copy the generated code.
 
