@@ -1,5 +1,7 @@
 # particle-life-bg
 
+![min+gzip](https://img.shields.io/badge/min%2Bgzip-5.7%20kB-informational)
+
 > Particle Life (asymmetric attraction) animated canvas background. Zero-dependency core with an optional React component.
 
 Each particle type is attracted to or repelled by the other types according to an asymmetric matrix. Cells, chains and chasers emerge on their own.
@@ -67,6 +69,19 @@ import { ParticleLifeBg } from 'particle-life-bg/react'
 ```
 
 `react` is an optional peer dependency. The root entry never imports it.
+
+## Size
+
+Zero dependencies. Measured by bundling each import with esbuild (`pnpm build && pnpm size`), the same way bundlers see it.
+
+<!-- size:start -->
+| import                     |     min | min + gzip | min + brotli |                                          |
+| -------------------------- | ------: | ---------: | -----------: | ---------------------------------------- |
+| `mount` only               | 11.4 kB |     4.9 kB |       4.4 kB | typical vanilla usage after tree-shaking |
+| `particle-life-bg`         | 13.7 kB |     5.7 kB |       5.2 kB | everything exported from the main entry  |
+| `particle-life-bg/element` | 14.4 kB |     6.0 kB |       5.4 kB | registers `<particle-life-bg>`           |
+| `particle-life-bg/react`   | 12.3 kB |     5.1 kB |       4.7 kB | excluding react itself                   |
+<!-- size:end -->
 
 ## Options
 

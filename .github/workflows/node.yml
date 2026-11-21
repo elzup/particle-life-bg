@@ -29,4 +29,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm typecheck
-      - run: pnpm test:cov # pretest builds lib/
+      - run: pnpm test:cov
+      - run: pnpm build
+      - run: pnpm size:check # README のサイズ表とバッジが今のビルドと一致するか

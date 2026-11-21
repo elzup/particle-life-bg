@@ -53,7 +53,9 @@
     "test:cov": "node --test --experimental-test-coverage --test-coverage-include=\"src/**\" \"test/**/*.test.ts\"",
     "prepublishOnly": "pnpm build && pnpm test",
     "build:wasm": "cargo build --release --target wasm32-unknown-unknown --manifest-path wasm/Cargo.toml && RUSTFLAGS='-C target-feature=+simd128' cargo build --release --target wasm32-unknown-unknown --manifest-path wasm/Cargo.toml --target-dir wasm/target-simd && mkdir -p lib/wasm && cp wasm/target/wasm32-unknown-unknown/release/particle_life_sim.wasm lib/wasm/sim.wasm && cp wasm/target-simd/wasm32-unknown-unknown/release/particle_life_sim.wasm lib/wasm/sim-simd.wasm",
-    "bench": "node scripts/bench.ts"
+    "bench": "node scripts/bench.ts",
+    "size": "node scripts/size.ts",
+    "size:check": "node scripts/size.ts --check"
   },
   "files": [
     "lib/"
@@ -66,6 +68,7 @@
     "@biomejs/biome": "^2.6.7",
     "@types/node": "^24.0.0",
     "@types/react": "^19.3.0",
+    "esbuild": "^0.28.2",
     "react": "^19.3.1",
     "typescript": "^7.0.2"
   },
