@@ -108,3 +108,15 @@ describe('colors / background の上書き', () => {
     assert.equal(hexLuminance('red'), undefined)
   })
 })
+
+describe('spawn / holdMs', () => {
+  test('holdMs の既定は 0 で、負の値は 0 にする', () => {
+    assert.equal(resolveOptions({}).holdMs, 0)
+    assert.equal(resolveOptions({ holdMs: -5 }).holdMs, 0)
+    assert.equal(resolveOptions({ holdMs: 800 }).holdMs, 800)
+  })
+  test('spawn はそのまま渡す', () => {
+    const spawn = () => []
+    assert.equal(resolveOptions({ spawn }).spawn, spawn)
+  })
+})

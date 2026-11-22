@@ -5,6 +5,7 @@ import {
   type Params,
   type Rng,
   randomMatrix,
+  type SpawnPoint,
   seededRng,
   snakeMatrix,
   symmetricMatrix,
@@ -49,7 +50,23 @@ export type Options = {
   respectReducedMotion?: boolean
   /** 計算の実装。auto は WASM SIMD が使えればそれで、使えなければ JS で計算する (結果は同じ) */
   engine?: Engine
+  /**
+   * 初期配置。撒くたびに呼ばれ、返した点に先頭の粒子から置く (足りない分は乱数の配置のまま)。
+   * 文字や図形を描いた状態から始めたいとき用。属性では書けないので property で渡す
+   */
+  spawn?: SpawnFn
+  /** 最初に画面に見えてから動き出すまで止めておくミリ秒。spawn で描いた形を一瞬見せるため */
+  holdMs?: number
 }
+
+export type SpawnContext = {
+  count: number
+  types: number
+  /** 要素の幅 / 高さ。点の座標は 0〜1 なので、縦横比を見て形を潰さないようにするのに使う */
+  aspect: number
+}
+
+export type SpawnFn = (ctx: SpawnContext) => readonly SpawnPoint[]
 
 export type Resolved = {
   types: number
@@ -66,6 +83,8 @@ export type Resolved = {
   pauseWhenHidden: boolean
   respectReducedMotion: boolean
   engine: Engine
+  spawn: SpawnFn | undefined
+  holdMs: number
 }
 
 export const DEFAULTS = {
@@ -177,6 +196,8 @@ export const resolveOptions = (
     pauseWhenHidden: o.pauseWhenHidden ?? true,
     respectReducedMotion: o.respectReducedMotion ?? true,
     engine: o.engine === 'js' ? 'js' : 'auto',
+    spawn: o.spawn,
+    holdMs: Math.max(0, o.holdMs ?? 0),
   }
 }
 

@@ -5,6 +5,7 @@ import {
   BETA,
   createWorld,
   force,
+  placeWorld,
   resizeWorld,
   seededRng,
   snakeMatrix,
@@ -140,5 +141,38 @@ describe('resizeWorld', () => {
     assert.equal(world.width, 2)
     close(world.x[0] ?? 0, 0.5)
     close(world.x[1] ?? 0, 1.5)
+  })
+})
+
+describe('placeWorld', () => {
+  test('先頭の粒子から点の位置と種類に置き、x は幅を掛ける', () => {
+    const w = createWorld(3, 4, 2, seededRng(1))
+    const lastX = w.x[2]
+    placeWorld(
+      w,
+      [
+        { x: 0.5, y: 0.25, type: 3 },
+        { x: 0.1, y: 0.9 },
+      ],
+      4
+    )
+    close(w.x[0] ?? -1, 1)
+    close(w.y[0] ?? -1, 0.25)
+    assert.equal(w.types[0], 3)
+    close(w.x[1] ?? -1, 0.2)
+    assert.equal(w.x[2], lastX)
+  })
+  test('範囲外の種類は丸め、点が多ければ余りを捨てる', () => {
+    const w = createWorld(1, 2, 1, seededRng(1))
+    placeWorld(
+      w,
+      [
+        { x: 0, y: 0, type: 9 },
+        { x: 0.5, y: 0.5 },
+      ],
+      2
+    )
+    assert.equal(w.types[0], 1)
+    assert.equal(w.count, 1)
   })
 })

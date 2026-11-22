@@ -8,6 +8,7 @@ import { createRenderer, type Viewport } from './render.ts'
 import {
   createWorld,
   type Matrix,
+  placeWorld,
   randomMatrix,
   resizeWorld,
   seededRng,
@@ -71,14 +72,23 @@ const readViewport = (
   }
 }
 
-const spawn = (r: Resolved, width: number): World =>
-  createWorld(
+const spawn = (r: Resolved, width: number): World => {
+  const world = createWorld(
     r.count,
     r.types,
     width,
     // 行列と同じ乱数列を使うと配置が行列に引きずられるので種をずらす
     r.seed === undefined ? Math.random : seededRng(r.seed + 1)
   )
+
+  if (r.spawn !== undefined)
+    placeWorld(
+      world,
+      r.spawn({ count: r.count, types: r.types, aspect: width }),
+      r.types
+    )
+  return world
+}
 
 const reducedMotion = () =>
   typeof window.matchMedia === 'function' &&
@@ -99,6 +109,9 @@ export const mount = (
   let raf = 0
   let lastStepAt = 0
   let isDestroyed = false
+  // holdMs の解除時刻。mount 時ではなく最初に loop が回った (= 画面に見えた) 時から数える。
+  // 画面外で始まる要素 (下の方のセクション) だと、見る前に形が崩れてしまうため
+  let holdUntil: number | null = null
   // 読み込みが済むまでと、WASM が使えない環境では JS 版。engine を切り替えた後に古い読み込みが届いても無視する
   let stepWorld: Stepper = step
   let activeEngine: 'js' | 'wasm' = 'js'
@@ -153,6 +166,12 @@ export const mount = (
     raf = requestAnimationFrame(loop)
     if (now - lastStepAt < 1000 / cfg.fps - 1) return
     lastStepAt = now
+    holdUntil ??= now + cfg.holdMs
+    // 止めている間も描きはする。resize で canvas が消えると、次に描くまで空になるため
+    if (now < holdUntil) {
+      draw()
+      return
+    }
     stepWorld(world, cfg.matrix, cfg.params, SIM_DT)
     draw()
   }
@@ -201,7 +220,10 @@ export const mount = (
 
     input = next
     cfg = rematrix ? resolved : { ...resolved, matrix: cfg.matrix }
-    if (respawn) world = spawn(cfg, viewport.width / viewport.height)
+    if (respawn) {
+      world = spawn(cfg, viewport.width / viewport.height)
+      holdUntil = null
+    }
     if (engineChanged) applyEngine()
     if (!isRunning()) draw()
     sync()
@@ -227,6 +249,8 @@ export const mount = (
     },
     respawn: () => {
       world = spawn(cfg, viewport.width / viewport.height)
+      holdUntil = null
+      draw()
     },
     destroy: () => {
       isDestroyed = true

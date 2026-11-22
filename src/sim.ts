@@ -124,6 +124,30 @@ export const createWorld = (
   }
 }
 
+/** 初期配置の 1 点。x, y は要素の幅・高さに対する 0〜1。type を省くと乱数で撒いた種類のまま */
+export type SpawnPoint = { x: number; y: number; type?: number }
+
+/**
+ * 撒いた world の先頭から points の位置に置き直す。点が粒子数より少なければ残りは乱数の配置のまま、
+ * 多ければ余りを捨てる (粒子数は count が決める)
+ */
+export const placeWorld = (
+  world: World,
+  points: readonly SpawnPoint[],
+  typeCount: number
+): void => {
+  const n = Math.min(world.count, points.length)
+
+  for (let i = 0; i < n; i++) {
+    const p = points[i]
+    if (p === undefined) continue
+    world.x[i] = wrap(p.x * world.width, world.width)
+    world.y[i] = wrap(p.y, 1)
+    if (p.type !== undefined)
+      world.types[i] = Math.min(typeCount - 1, Math.max(0, Math.floor(p.type)))
+  }
+}
+
 /** 縦横比が変わったとき、粒子の横位置を比例で伸縮して模様を保つ (撒き直すと構造が消える) */
 export const resizeWorld = (world: World, width: number): void => {
   const k = width / world.width

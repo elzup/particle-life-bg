@@ -35,6 +35,7 @@ export const ATTRIBUTES: readonly AttributeSpec[] = [
     kind: 'boolean',
   },
   { attr: 'engine', key: 'engine', kind: 'string' },
+  { attr: 'hold-ms', key: 'holdMs', kind: 'number' },
 ]
 
 const MATRIX_PRESETS: readonly string[] = [

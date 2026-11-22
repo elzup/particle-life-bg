@@ -1,6 +1,6 @@
 # particle-life-bg
 
-![min+gzip](https://img.shields.io/badge/min%2Bgzip-6.4%20kB-informational)
+![min+gzip](https://img.shields.io/badge/min%2Bgzip-6.6%20kB-informational)
 
 > Particle Life (asymmetric attraction) animated canvas background. Zero-dependency core with an optional React component.
 
@@ -79,34 +79,36 @@ Zero dependencies. Measured by bundling each import with esbuild (`pnpm build &&
 <!-- size:start -->
 | import                     |     min | min + gzip | min + brotli |                                                                                |
 | -------------------------- | ------: | ---------: | -----------: | ------------------------------------------------------------------------------ |
-| `mount` only               | 13.2 kB |     5.6 kB |       5.0 kB | typical vanilla usage after tree-shaking                                       |
-| `particle-life-bg`         | 15.5 kB |     6.4 kB |       5.8 kB | everything exported from the main entry                                        |
-| `particle-life-bg/element` | 16.2 kB |     6.7 kB |       6.1 kB | registers `<particle-life-bg>`                                                 |
-| `particle-life-bg/react`   | 14.1 kB |     5.9 kB |       5.3 kB | excluding react itself                                                         |
+| `mount` only               | 13.6 kB |     5.7 kB |       5.2 kB | typical vanilla usage after tree-shaking                                       |
+| `particle-life-bg`         | 16.0 kB |     6.6 kB |       6.0 kB | everything exported from the main entry                                        |
+| `particle-life-bg/element` | 16.9 kB |     6.9 kB |       6.3 kB | registers `<particle-life-bg>`                                                 |
+| `particle-life-bg/react`   | 14.5 kB |     6.0 kB |       5.5 kB | excluding react itself                                                         |
 | WASM SIMD chunk            | 38.4 kB |    14.8 kB |      13.2 kB | fetched after the first frame via dynamic import (skipped with `engine: "js"`) |
 <!-- size:end -->
 
 ## Options
 
-| option                 | default     |                                                                                                                           |
-| ---------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `types`                | `5`         | number of particle types (ignored when `matrix` is an array)                                                              |
-| `count`                | `1500`      | particles. Cost ≈ count × neighbours, independent of the element size                                                     |
-| `matrix`               | `'random'`  | `number[][]` (`matrix[i][j]`: how strongly i is pulled toward j, -1..1) or `'random' \| 'symmetric' \| 'snake' \| 'zero'` |
-| `seed`                 | —           | fixes the matrix and initial positions                                                                                    |
-| `rMax`                 | `0.1`       | interaction radius, relative to the element height                                                                        |
-| `friction`             | `0.04`      | velocity half-life in seconds                                                                                             |
-| `force`                | `10`        | force multiplier                                                                                                          |
-| `drawStyle`            | `'dots'`    | `dots` `glow` `trail` `streak` `links` `mono` `speedGlow` `crowdGlow`, or an array per type (repeats)                     |
-| `scheme`               | `'rainbow'` | `rainbow` `neon` `okabeIto` `ocean` `fire` `gray` `paper`, or a `ColorScheme` object                                      |
-| `colors`               | scheme      | one CSS color per type (repeats), overriding the scheme colors. Attribute: space-separated                                |
-| `background`           | scheme bg   | any CSS color, or `'transparent'`. A light `#hex` switches glow to normal blending                                        |
-| `fps`                  | `30`        | simulation (and redraw) rate. 60 for smoother motion, at twice the CPU                                                    |
-| `maxPixelRatio`        | `2`         | caps canvas resolution on high-DPI screens                                                                                |
-| `paused`               | `false`     |                                                                                                                           |
-| `pauseWhenHidden`      | `true`      | stops while off-screen or the tab is hidden                                                                               |
-| `respectReducedMotion` | `true`      | with `prefers-reduced-motion: reduce`, renders a single still frame                                                       |
-| `engine`               | `'auto'`    | `'auto'`: WASM SIMD (3.5–4.8× faster step) once loaded, JS until then and where unsupported. `'js'`: never load WASM      |
+| option                 | default     |                                                                                                                                          |
+| ---------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `types`                | `5`         | number of particle types (ignored when `matrix` is an array)                                                                             |
+| `count`                | `1500`      | particles. Cost ≈ count × neighbours, independent of the element size                                                                    |
+| `matrix`               | `'random'`  | `number[][]` (`matrix[i][j]`: how strongly i is pulled toward j, -1..1) or `'random' \| 'symmetric' \| 'snake' \| 'zero'`                |
+| `seed`                 | —           | fixes the matrix and initial positions                                                                                                   |
+| `rMax`                 | `0.1`       | interaction radius, relative to the element height                                                                                       |
+| `friction`             | `0.04`      | velocity half-life in seconds                                                                                                            |
+| `force`                | `10`        | force multiplier                                                                                                                         |
+| `drawStyle`            | `'dots'`    | `dots` `glow` `trail` `streak` `links` `mono` `speedGlow` `crowdGlow`, or an array per type (repeats)                                    |
+| `scheme`               | `'rainbow'` | `rainbow` `neon` `okabeIto` `ocean` `fire` `gray` `paper`, or a `ColorScheme` object                                                     |
+| `colors`               | scheme      | one CSS color per type (repeats), overriding the scheme colors. Attribute: space-separated                                               |
+| `background`           | scheme bg   | any CSS color, or `'transparent'`. A light `#hex` switches glow to normal blending                                                       |
+| `fps`                  | `30`        | simulation (and redraw) rate. 60 for smoother motion, at twice the CPU                                                                   |
+| `maxPixelRatio`        | `2`         | caps canvas resolution on high-DPI screens                                                                                               |
+| `paused`               | `false`     |                                                                                                                                          |
+| `pauseWhenHidden`      | `true`      | stops while off-screen or the tab is hidden                                                                                              |
+| `respectReducedMotion` | `true`      | with `prefers-reduced-motion: reduce`, renders a single still frame                                                                      |
+| `engine`               | `'auto'`    | `'auto'`: WASM SIMD (3.5–4.8× faster step) once loaded, JS until then and where unsupported. `'js'`: never load WASM                     |
+| `spawn`                | —           | `({ count, types, aspect }) => { x, y, type? }[]` (0..1). Initial positions for the first particles, e.g. a shape or text. Property only |
+| `holdMs`               | `0`         | keeps the initial layout still for this long after the element first becomes visible, then starts moving                                 |
 
 ## Demo
 
