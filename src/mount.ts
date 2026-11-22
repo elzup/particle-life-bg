@@ -14,6 +14,7 @@ import {
   step,
   type World,
 } from './sim.ts'
+import { loadWasmStep, type Stepper } from './wasm.ts'
 
 // 実時間ではなく固定刻みで進める。タブ復帰時などに dt が跳ねると粒子が吹き飛ぶため
 const SIM_DT = 0.02
@@ -31,6 +32,8 @@ export type Controller = {
   /** 粒子を撒き直す */
   respawn: () => void
   readonly matrix: Matrix
+  /** 今 step を計算している実装。engine が auto でも、WASM の読み込みが済むまでと非対応の環境では js */
+  readonly engine: 'js' | 'wasm'
   destroy: () => void
 }
 
@@ -96,6 +99,29 @@ export const mount = (
   let raf = 0
   let lastStepAt = 0
   let isDestroyed = false
+  // 読み込みが済むまでと、WASM が使えない環境では JS 版。engine を切り替えた後に古い読み込みが届いても無視する
+  let stepWorld: Stepper = step
+  let activeEngine: 'js' | 'wasm' = 'js'
+  let engineLoad = 0
+
+  const applyEngine = () => {
+    const ticket = ++engineLoad
+
+    stepWorld = step
+    activeEngine = 'js'
+    if (cfg.engine === 'js') return
+    loadWasmStep()
+      .then((wasmStep) => {
+        if (wasmStep !== null && ticket === engineLoad && !isDestroyed) {
+          stepWorld = wasmStep
+          activeEngine = 'wasm'
+        }
+      })
+      .catch((e: unknown) => {
+        // instantiate の失敗 (メモリ不足など)。JS 版のまま動かし続けられる
+        console.info('particle-life-bg: WASM SIMD を使わず JS で計算する', e)
+      })
+  }
 
   const isStill = () => cfg.respectReducedMotion && reducedMotion()
   const isRunning = () =>
@@ -116,7 +142,7 @@ export const mount = (
 
   const drawStill = () => {
     for (let k = 0; k < STILL_WARMUP_STEPS; k++)
-      step(world, cfg.matrix, cfg.params, SIM_DT)
+      stepWorld(world, cfg.matrix, cfg.params, SIM_DT)
     draw()
   }
 
@@ -127,7 +153,7 @@ export const mount = (
     raf = requestAnimationFrame(loop)
     if (now - lastStepAt < 1000 / cfg.fps - 1) return
     lastStepAt = now
-    step(world, cfg.matrix, cfg.params, SIM_DT)
+    stepWorld(world, cfg.matrix, cfg.params, SIM_DT)
     draw()
   }
 
@@ -171,14 +197,17 @@ export const mount = (
     const next = mode === 'replace' ? { ...patch } : { ...input, ...patch }
     const { respawn, rematrix } = diffOptions(input, next)
     const resolved = resolveOptions(next)
+    const engineChanged = resolved.engine !== cfg.engine
 
     input = next
     cfg = rematrix ? resolved : { ...resolved, matrix: cfg.matrix }
     if (respawn) world = spawn(cfg, viewport.width / viewport.height)
+    if (engineChanged) applyEngine()
     if (!isRunning()) draw()
     sync()
   }
 
+  applyEngine()
   draw()
   sync()
 
@@ -186,6 +215,9 @@ export const mount = (
     canvas,
     get matrix() {
       return cfg.matrix
+    },
+    get engine() {
+      return activeEngine
     },
     setOptions,
     pause: () => setOptions({ paused: true }),

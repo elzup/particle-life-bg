@@ -8,6 +8,7 @@ export {
 export { type Controller, mount } from './mount.ts'
 export {
   DEFAULTS,
+  type Engine,
   type MatrixPreset,
   type Options,
   resolveOptions,
@@ -27,3 +28,4 @@ export {
   type World,
   zeroMatrix,
 } from './sim.ts'
+export { loadWasmStep, type Stepper } from './wasm.ts'

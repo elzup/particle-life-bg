@@ -34,6 +34,7 @@ export const ATTRIBUTES: readonly AttributeSpec[] = [
     key: 'respectReducedMotion',
     kind: 'boolean',
   },
+  { attr: 'engine', key: 'engine', kind: 'string' },
 ]
 
 const MATRIX_PRESETS: readonly string[] = [
@@ -89,6 +90,7 @@ export const parseAttribute = (
     return list.length === 0 ? undefined : list
   }
   if (kind === 'matrix') return parseMatrix(raw)
+  // string の属性は scheme と engine。どちらも resolveOptions が知らない値を既定に戻す
   return raw as SchemeName
 }
 

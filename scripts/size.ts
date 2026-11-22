@@ -5,9 +5,14 @@ import { spawnSync } from 'node:child_process'
 import { readFile, writeFile } from 'node:fs/promises'
 import { brotliCompressSync, gzipSync } from 'node:zlib'
 
-import { build } from 'esbuild'
+import { build, type Plugin } from 'esbuild'
 
-type Entry = { label: string; code: string; note: string }
+type Entry = {
+  label: string
+  code: string
+  note: string
+  isLazyChunk?: boolean
+}
 
 // 利用者が書く import をそのまま入口にする。tree-shaking 後の実際の重さが分かるよう mount だけの場合も測る
 const ENTRIES: Entry[] = [
@@ -31,6 +36,12 @@ const ENTRIES: Entry[] = [
     code: `export * from './lib/esm/react.js'`,
     note: 'excluding react itself',
   },
+  {
+    label: 'WASM SIMD chunk',
+    code: `export * from './lib/esm/wasm-simd.gen.js'`,
+    note: 'fetched after the first frame via dynamic import (skipped with `engine: "js"`)',
+    isLazyChunk: true,
+  },
 ]
 
 const README = new URL('../readme.md', import.meta.url)
@@ -38,6 +49,17 @@ const ROOT = new URL('..', import.meta.url).pathname
 const START = '<!-- size:start -->'
 const END = '<!-- size:end -->'
 const BADGE_RE = /!\[min\+gzip\]\([^)]*\)/
+
+// bundler は dynamic import を別 chunk に分けるので、入口の重さからは wasm を外し、別の行で測る
+const lazyWasm: Plugin = {
+  name: 'lazy-wasm',
+  setup: (b) => {
+    b.onResolve({ filter: /wasm-simd\.gen\.js$/ }, (args) => ({
+      path: args.path,
+      external: true,
+    }))
+  },
+}
 
 const measure = async (entry: Entry) => {
   const result = await build({
@@ -49,6 +71,7 @@ const measure = async (entry: Entry) => {
     external: ['react'],
     write: false,
     logLevel: 'error',
+    plugins: entry.isLazyChunk ? [] : [lazyWasm],
   })
   const bytes = result.outputFiles[0].contents
   return {

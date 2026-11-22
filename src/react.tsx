@@ -32,6 +32,9 @@ const delegate = (ref: { current: Controller | null }): Controller => ({
   get matrix() {
     return ref.current?.matrix ?? []
   },
+  get engine() {
+    return ref.current?.engine ?? 'js'
+  },
   setOptions: (patch, mode) => ref.current?.setOptions(patch, mode),
   pause: () => ref.current?.pause(),
   resume: () => ref.current?.resume(),

@@ -11,6 +11,8 @@ import {
   zeroMatrix,
 } from './sim.ts'
 
+export type Engine = 'auto' | 'js'
+
 export type MatrixPreset = 'random' | 'symmetric' | 'snake' | 'zero'
 
 export type Options = {
@@ -45,6 +47,8 @@ export type Options = {
   pauseWhenHidden?: boolean
   /** OS の「視差効果を減らす」設定のとき、動かさず 1 枚絵として描く */
   respectReducedMotion?: boolean
+  /** 計算の実装。auto は WASM SIMD が使えればそれで、使えなければ JS で計算する (結果は同じ) */
+  engine?: Engine
 }
 
 export type Resolved = {
@@ -61,6 +65,7 @@ export type Resolved = {
   paused: boolean
   pauseWhenHidden: boolean
   respectReducedMotion: boolean
+  engine: Engine
 }
 
 export const DEFAULTS = {
@@ -171,6 +176,7 @@ export const resolveOptions = (
     paused: o.paused ?? false,
     pauseWhenHidden: o.pauseWhenHidden ?? true,
     respectReducedMotion: o.respectReducedMotion ?? true,
+    engine: o.engine === 'js' ? 'js' : 'auto',
   }
 }
 

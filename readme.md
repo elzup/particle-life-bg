@@ -1,6 +1,6 @@
 # particle-life-bg
 
-![min+gzip](https://img.shields.io/badge/min%2Bgzip-5.7%20kB-informational)
+![min+gzip](https://img.shields.io/badge/min%2Bgzip-6.4%20kB-informational)
 
 > Particle Life (asymmetric attraction) animated canvas background. Zero-dependency core with an optional React component.
 
@@ -77,12 +77,13 @@ import { ParticleLifeBg } from 'particle-life-bg/react'
 Zero dependencies. Measured by bundling each import with esbuild (`pnpm build && pnpm size`), the same way bundlers see it.
 
 <!-- size:start -->
-| import                     |     min | min + gzip | min + brotli |                                          |
-| -------------------------- | ------: | ---------: | -----------: | ---------------------------------------- |
-| `mount` only               | 11.4 kB |     4.9 kB |       4.4 kB | typical vanilla usage after tree-shaking |
-| `particle-life-bg`         | 13.7 kB |     5.7 kB |       5.2 kB | everything exported from the main entry  |
-| `particle-life-bg/element` | 14.4 kB |     6.0 kB |       5.4 kB | registers `<particle-life-bg>`           |
-| `particle-life-bg/react`   | 12.3 kB |     5.1 kB |       4.7 kB | excluding react itself                   |
+| import                     |     min | min + gzip | min + brotli |                                                                                |
+| -------------------------- | ------: | ---------: | -----------: | ------------------------------------------------------------------------------ |
+| `mount` only               | 13.2 kB |     5.6 kB |       5.0 kB | typical vanilla usage after tree-shaking                                       |
+| `particle-life-bg`         | 15.5 kB |     6.4 kB |       5.8 kB | everything exported from the main entry                                        |
+| `particle-life-bg/element` | 16.2 kB |     6.7 kB |       6.1 kB | registers `<particle-life-bg>`                                                 |
+| `particle-life-bg/react`   | 14.1 kB |     5.9 kB |       5.3 kB | excluding react itself                                                         |
+| WASM SIMD chunk            | 38.4 kB |    14.8 kB |      13.2 kB | fetched after the first frame via dynamic import (skipped with `engine: "js"`) |
 <!-- size:end -->
 
 ## Options
@@ -105,6 +106,7 @@ Zero dependencies. Measured by bundling each import with esbuild (`pnpm build &&
 | `paused`               | `false`     |                                                                                                                           |
 | `pauseWhenHidden`      | `true`      | stops while off-screen or the tab is hidden                                                                               |
 | `respectReducedMotion` | `true`      | with `prefers-reduced-motion: reduce`, renders a single still frame                                                       |
+| `engine`               | `'auto'`    | `'auto'`: WASM SIMD (3.5–4.8× faster step) once loaded, JS until then and where unsupported. `'js'`: never load WASM      |
 
 ## Demo
 
@@ -120,7 +122,7 @@ $ pnpm build && npx serve .
 
 ### Benchmarks
 
-Used to decide whether a WASM engine or another renderer is worth shipping. These benchmarks are not part of the package.
+Used to decide whether a WASM engine or another renderer is worth shipping. These benchmarks are not part of the package. The package ships only the SIMD build, embedded as base64 in `src/wasm-simd.gen.ts` so that neither CI nor your bundler needs a Rust or `.wasm` setup; `pnpm build:wasm` regenerates it.
 
 ```
 $ pnpm build && pnpm build:wasm   # needs the wasm32-unknown-unknown Rust target
