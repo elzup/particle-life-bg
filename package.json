@@ -1,6 +1,6 @@
 {
   "name": "particle-life-bg",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Particle Life (asymmetric attraction) animated canvas background. Zero-dependency core with an optional React component.",
   "author": "elzup",
   "license": "MIT",
