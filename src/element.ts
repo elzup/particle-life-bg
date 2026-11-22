@@ -40,6 +40,17 @@ export class ParticleLifeBgElement extends Base {
     return { ...readAttributes((a) => this.getAttribute(a)), ...this.#props }
   }
 
+  // 登録 (import) 前に el.options / el.matrix へ代入された値は、class の setter を通らず要素自身の
+  // property として残る。spawn のように最初の撒きで要る値を先に渡せるよう、拾い直して setter に流す
+  #upgradeProps() {
+    for (const key of ['options', 'matrix'] as const) {
+      if (!Object.hasOwn(this, key)) continue
+      const value: unknown = Reflect.get(this, key)
+      Reflect.deleteProperty(this, key)
+      Reflect.set(this, key, value)
+    }
+  }
+
   #apply() {
     this.#controller?.setOptions(this.#options(), 'replace')
   }
@@ -47,6 +58,7 @@ export class ParticleLifeBgElement extends Base {
   connectedCallback() {
     const canvas = this.shadowRoot?.querySelector('canvas')
     if (!canvas || this.#controller) return
+    this.#upgradeProps()
     this.#controller = mount(canvas, this.#options())
   }
 
