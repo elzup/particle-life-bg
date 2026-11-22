@@ -33,6 +33,7 @@ const bg = mount(document.querySelector('.hero'), {
 
 bg.setOptions({ scheme: 'ocean' }) // partial update, keeps the pattern
 bg.shuffle() // new random attraction matrix
+bg.engine // 'js' until the WASM chunk loads, then 'wasm' (stays 'js' where unsupported)
 bg.destroy()
 ```
 
