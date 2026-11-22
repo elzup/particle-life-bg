@@ -1,10 +1,8 @@
 // パラメーター調整 → 1 画面プレビュー (フォーマット切替) → コード生成 → 負荷見積もり
-import {
-  COLOR_SCHEMES,
-  DEFAULTS,
-  DRAW_STYLES,
-  toAttributes,
-} from '../lib/esm/index.js'
+
+// 属性への書き出しは公開 API ではないので、ビルド済みのモジュールを直接読む
+import { toAttributes } from '../lib/esm/attributes.js'
+import { COLOR_SCHEMES, DEFAULTS, DRAW_STYLES } from '../lib/esm/index.js'
 import {
   BASE_DEFAULTS,
   toHtml,
@@ -115,7 +113,7 @@ const libOptions = (s) => ({
   matrix: s.matrix,
   seed: s.seed,
   rMax: s.rMax,
-  friction: s.friction,
+  frictionHalfLife: s.friction,
   force: s.force,
   drawStyle: s.drawStyle,
   scheme: s.scheme,

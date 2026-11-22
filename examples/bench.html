@@ -63,7 +63,7 @@
 
     <script type="module">
       // pnpm build && pnpm build:wasm してから、リポのルートで静的サーバーを立てて開く
-      import * as lib from '../lib/esm/index.js'
+      import * as lib from '../lib/esm/sim-api.js'
       import { COUNTS, maxDrift, runBench } from './bench-core.js'
       import { runDrawBench } from './draw-bench.js'
       import { loadWasmSim } from './wasm-sim.js'

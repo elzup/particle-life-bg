@@ -29,7 +29,7 @@ const timeSteps = (stepOnce, now) => {
 }
 
 /**
- * @param {typeof import('../src/index.ts')} lib
+ * @param {typeof import('../src/sim-api.ts')} lib
  * @param {{ name: string, sim: Awaited<ReturnType<typeof import('./wasm-sim.js').loadWasmSim>> }[]} wasms
  * @param {() => number} now
  */

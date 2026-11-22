@@ -27,7 +27,9 @@ export type Options = {
   seed?: number
   /** 相互作用が届く距離 (要素の高さ 1 に対する比) */
   rMax?: number
-  /** 速度が半分になるまでの秒数 */
+  /** 速度が半分になるまでの秒数。大きいほど滑る (摩擦が弱い) */
+  frictionHalfLife?: number
+  /** @deprecated frictionHalfLife の旧名 (値の意味が「摩擦の強さ」と逆に読めるため改名)。両方あれば frictionHalfLife が勝つ */
   friction?: number
   /** 力の倍率 */
   force?: number
@@ -91,7 +93,7 @@ export const DEFAULTS = {
   types: 5,
   count: 1500,
   rMax: 0.1,
-  friction: 0.04,
+  frictionHalfLife: 0.04,
   force: 10,
   fps: 30,
   maxPixelRatio: 2,
@@ -183,7 +185,8 @@ export const resolveOptions = (
     seed: o.seed,
     params: {
       rMax: o.rMax ?? DEFAULTS.rMax,
-      frictionHalfLife: o.friction ?? DEFAULTS.friction,
+      frictionHalfLife:
+        o.frictionHalfLife ?? o.friction ?? DEFAULTS.frictionHalfLife,
       forceFactor: o.force ?? DEFAULTS.force,
     },
     styles: resolveStyles(o.drawStyle, types),

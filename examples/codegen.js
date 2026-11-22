@@ -47,7 +47,7 @@ export const toOptions = (s, d = BASE_DEFAULTS) => {
     ],
     ['seed', s.seed !== undefined && s.seed],
     ['rMax', s.rMax !== d.rMax && s.rMax],
-    ['friction', s.friction !== d.friction && s.friction],
+    ['frictionHalfLife', s.friction !== d.friction && s.friction],
     ['force', s.force !== d.force && s.force],
     [
       'drawStyle',

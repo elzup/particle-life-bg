@@ -19,6 +19,8 @@ export const ATTRIBUTES: readonly AttributeSpec[] = [
   { attr: 'matrix', key: 'matrix', kind: 'matrix' },
   { attr: 'seed', key: 'seed', kind: 'number' },
   { attr: 'r-max', key: 'rMax', kind: 'number' },
+  { attr: 'friction-half-life', key: 'frictionHalfLife', kind: 'number' },
+  // 0.2 までの属性名。消すと既存の HTML が黙って既定値に戻るので読みだけ残す
   { attr: 'friction', key: 'friction', kind: 'number' },
   { attr: 'force', key: 'force', kind: 'number' },
   { attr: 'draw-style', key: 'drawStyle', kind: 'styles' },

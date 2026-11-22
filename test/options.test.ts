@@ -120,3 +120,17 @@ describe('spawn / holdMs', () => {
     assert.equal(resolveOptions({ spawn }).spawn, spawn)
   })
 })
+
+describe('frictionHalfLife (旧名 friction)', () => {
+  test('既定値と、旧名でも同じ値になる', () => {
+    assert.equal(resolveOptions({}).params.frictionHalfLife, 0.04)
+    assert.equal(resolveOptions({ friction: 0.1 }).params.frictionHalfLife, 0.1)
+  })
+  test('両方あれば新しい名前が勝つ', () => {
+    assert.equal(
+      resolveOptions({ friction: 0.1, frictionHalfLife: 0.2 }).params
+        .frictionHalfLife,
+      0.2
+    )
+  })
+})

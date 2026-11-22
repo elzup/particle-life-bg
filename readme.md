@@ -1,6 +1,6 @@
 # particle-life-bg
 
-![min+gzip](https://img.shields.io/badge/min%2Bgzip-6.6%20kB-informational)
+![min+gzip](https://img.shields.io/badge/min%2Bgzip-5.8%20kB-informational)
 
 > Particle Life (asymmetric attraction) animated canvas background. Zero-dependency core with an optional React component.
 
@@ -72,6 +72,26 @@ import { ParticleLifeBg } from 'particle-life-bg/react'
 
 `react` is an optional peer dependency. The root entry never imports it.
 
+### Simulation only
+
+`particle-life-bg/sim` exposes the simulation without the canvas, for your own renderer (WebGL, SVG, a worker, …).
+
+```js
+import {
+  createWorld,
+  loadWasmStep,
+  randomMatrix,
+  step,
+} from 'particle-life-bg/sim'
+
+const matrix = randomMatrix(5)
+const world = createWorld(2000, 5, 16 / 9) // width / height of the space; height is 1
+const params = { rMax: 0.1, frictionHalfLife: 0.04, forceFactor: 10 }
+const stepWorld = (await loadWasmStep()) ?? step // WASM SIMD, or null where unsupported
+
+stepWorld(world, matrix, params, 0.02) // world.x / world.y / world.types are typed arrays
+```
+
 ## Size
 
 Zero dependencies. Measured by bundling each import with esbuild (`pnpm build && pnpm size`), the same way bundlers see it.
@@ -80,8 +100,8 @@ Zero dependencies. Measured by bundling each import with esbuild (`pnpm build &&
 | import                     |     min | min + gzip | min + brotli |                                                                                |
 | -------------------------- | ------: | ---------: | -----------: | ------------------------------------------------------------------------------ |
 | `mount` only               | 13.6 kB |     5.7 kB |       5.2 kB | typical vanilla usage after tree-shaking                                       |
-| `particle-life-bg`         | 16.0 kB |     6.6 kB |       6.0 kB | everything exported from the main entry                                        |
-| `particle-life-bg/element` | 16.9 kB |     6.9 kB |       6.3 kB | registers `<particle-life-bg>`                                                 |
+| `particle-life-bg`         | 13.9 kB |     5.8 kB |       5.3 kB | everything exported from the main entry                                        |
+| `particle-life-bg/element` | 17.0 kB |     6.9 kB |       6.3 kB | registers `<particle-life-bg>`                                                 |
 | `particle-life-bg/react`   | 14.5 kB |     6.0 kB |       5.5 kB | excluding react itself                                                         |
 | WASM SIMD chunk            | 38.4 kB |    14.8 kB |      13.2 kB | fetched after the first frame via dynamic import (skipped with `engine: "js"`) |
 <!-- size:end -->
@@ -95,7 +115,7 @@ Zero dependencies. Measured by bundling each import with esbuild (`pnpm build &&
 | `matrix`               | `'random'`  | `number[][]` (`matrix[i][j]`: how strongly i is pulled toward j, -1..1) or `'random' \| 'symmetric' \| 'snake' \| 'zero'`                |
 | `seed`                 | —           | fixes the matrix and initial positions                                                                                                   |
 | `rMax`                 | `0.1`       | interaction radius, relative to the element height                                                                                       |
-| `friction`             | `0.04`      | velocity half-life in seconds                                                                                                            |
+| `frictionHalfLife`     | `0.04`      | seconds for velocity to halve; larger = more glide. `friction` is the deprecated pre-0.3 name                                            |
 | `force`                | `10`        | force multiplier                                                                                                                         |
 | `drawStyle`            | `'dots'`    | `dots` `glow` `trail` `streak` `links` `mono` `speedGlow` `crowdGlow`, or an array per type (repeats)                                    |
 | `scheme`               | `'rainbow'` | `rainbow` `neon` `okabeIto` `ocean` `fire` `gray` `paper`, or a `ColorScheme` object                                                     |

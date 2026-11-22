@@ -5,7 +5,7 @@ import { describe, test } from 'node:test'
 
 import { maxDrift } from '../examples/bench-core.js'
 import { loadWasmSim } from '../examples/wasm-sim.js'
-import * as lib from '../src/index.ts'
+import * as lib from '../src/sim-api.ts'
 
 const builds = [
   { file: 'sim.wasm', isSimd: false },

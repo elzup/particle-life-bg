@@ -43,7 +43,7 @@ const timeFrames = (draw, ctx) => {
 }
 
 /**
- * @param {typeof import('../src/index.ts')} lib
+ * @param {typeof import('../src/sim-api.ts')} lib
  * @param {HTMLCanvasElement} canvas
  * @param {number[]} counts
  * @param {(msg: string) => void} onProgress

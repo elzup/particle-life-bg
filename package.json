@@ -19,6 +19,11 @@
       "import": "./lib/esm/react.js",
       "require": "./lib/cjs/react.js"
     },
+    "./sim": {
+      "types": "./lib/types/sim-api.d.ts",
+      "import": "./lib/esm/sim-api.js",
+      "require": "./lib/cjs/sim-api.js"
+    },
     "./element": {
       "types": "./lib/types/element.d.ts",
       "import": "./lib/esm/element.js",
